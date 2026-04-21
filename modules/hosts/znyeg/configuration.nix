@@ -58,6 +58,7 @@
             center = true;
             twentyFour = true;
           };
+          nvf.enable = true;
           yt-dlp.enable = true;
         };
 
@@ -69,6 +70,7 @@
         };
 
         software = {
+          aseprite.enable = true;
           ardour =
           {
             enable = true;
@@ -82,6 +84,7 @@
           inkscape.enable = true;
           kdenlive.enable = true;
           obsidian.enable = true;
+          blockbench.enable = true;
         };
 
         chat = {

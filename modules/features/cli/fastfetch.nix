@@ -17,9 +17,11 @@
           {
             "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
             "logo": {
-                "type": "small",
+                "type": "auto",
                 "padding": {
-                    "top": 2
+                    "top": 0,
+                    "left": 1,
+                    "right": 4
                 }
             },
             "modules": [
@@ -30,13 +32,16 @@
               "kernel",
               "uptime",
               "packages",
+              "shell",
               "display",
               "de",
               "wm",
-              "terminal",
-              "cpu",
               "gpu",
+              "cpu",
               "memory",
+              "disk",
+              "localip",
+              /*"terminal",*/
               "break",
               "colors"
             ]

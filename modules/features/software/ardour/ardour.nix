@@ -7,17 +7,17 @@
     
     activePackages = if pluginCfg.enable then pluginCfg.packages else [];
     
-    pluginBase = ./plugins; 
+    #pluginBase = ./plugins; 
   in {
     imports = [ self.nixosModules.ardour-plugins ];
     
     options.device.features.software.ardour = {
       enable = lib.mkEnableOption "Ardour DAW";
 
-      vstDir = lib.mkOption { type = lib.types.str; default = "${pluginBase}/vst"; };
-      vst3Dir = lib.mkOption { type = lib.types.str; default = "${pluginBase}/vst3"; };
-      lv2Dir = lib.mkOption { type = lib.types.str; default = "${pluginBase}/lv2"; };
-      ladspaDir = lib.mkOption { type = lib.types.str; default = "${pluginBase}/ladspa"; };
+      #vstDir = lib.mkOption { type = lib.types.str; default = "${pluginBase}/vst"; };
+      #vst3Dir = lib.mkOption { type = lib.types.str; default = "${pluginBase}/vst3"; };
+      #lv2Dir = lib.mkOption { type = lib.types.str; default = "${pluginBase}/lv2"; };
+      #ladspaDir = lib.mkOption { type = lib.types.str; default = "${pluginBase}/ladspa"; };
     };
 
     config = lib.mkIf cfg.enable {
@@ -35,10 +35,10 @@
           GDK_BACKEND = "x11";
 
           # Construct paths using both Nix Store packages and your local dirs
-          LV2_PATH    = "${lib.makeSearchPath "lib/lv2" activePackages}:${cfg.lv2Dir}:$LV2_PATH";
-          VST_PATH    = "${lib.makeSearchPath "lib/vst" activePackages}:${cfg.vstDir}:$VST_PATH";
-          VST3_PATH   = "${lib.makeSearchPath "lib/vst3" activePackages}:${cfg.vst3Dir}:$VST3_PATH";
-          LADSPA_PATH = "${lib.makeSearchPath "lib/ladspa" activePackages}:${cfg.ladspaDir}:$LADSPA_PATH";
+          #LV2_PATH    = "${lib.makeSearchPath "lib/lv2" activePackages}:${cfg.lv2Dir}:$LV2_PATH";
+          #VST_PATH    = "${lib.makeSearchPath "lib/vst" activePackages}:${cfg.vstDir}:$VST_PATH";
+          #VST3_PATH   = "${lib.makeSearchPath "lib/vst3" activePackages}:${cfg.vst3Dir}:$VST3_PATH";
+          #LADSPA_PATH = "${lib.makeSearchPath "lib/ladspa" activePackages}:${cfg.ladspaDir}:$LADSPA_PATH";
         };
       };
     };

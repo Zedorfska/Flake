@@ -17,6 +17,7 @@
     #stylix.url = "github:danth/stylix";
     
     nixcord.url = "github:FlameFlag/nixcord";
+    nvf.url = "github:notashelf/nvf";
   };
   
   outputs = inputs:

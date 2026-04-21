@@ -21,9 +21,6 @@
           mimeType = [ 
             "image/svg+xml" 
             "image/svg+xml-compressed" 
-            "application/pdf" 
-            "application/x-font-ttf" 
-            "image/png" 
           ];
         };
       };

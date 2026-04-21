@@ -21,7 +21,7 @@
             PartOf = [ "graphical-session.target" ];
           };
           Service = {
-            ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -o \"no-audio loop hwdec=auto\" '*' ${wallpaperPath}";
+            ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -o \"--hwdec=auto --vo=gpu --loop --no-audio\" '*' ${wallpaperPath}";
             Restart = "on-failure";
           };
           Install = {

@@ -8,6 +8,7 @@
       self.nixosModules.cli-base
       self.nixosModules.rmpc
       self.nixosModules.tty-clock
+      self.nixosModules.nvf
       self.nixosModules.yt-dlp
     ];
     
@@ -19,6 +20,7 @@
         base.enable = lib.mkDefault true;
         rmpc.enable = lib.mkDefault true;
         tty-clock.enable = lib.mkDefault true;
+        nvf.enable = lib.mkDefault true;
         yt-dlp.enable = lib.mkDefault true;
       };
     };

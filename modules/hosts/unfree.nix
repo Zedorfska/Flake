@@ -1,6 +1,7 @@
 { self, ... }: {
   flake.nixosModules.unfree = { lib, ... }: {
     nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+      "aseprite"
       "nvidia-x11"
       "nvidia-settings"
       "discord"
