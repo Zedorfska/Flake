@@ -67,6 +67,7 @@
 	  hyprshot.enable = true;
           portals.enable = true;
           mpv.enable = true;
+          qemu.enable = false;
         };
 
         software = {

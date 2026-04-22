@@ -8,6 +8,7 @@
       self.nixosModules.hyprshot
       self.nixosModules.portals
       self.nixosModules.mpv
+      self.nixosModules.qemu
     ];
     
     options.device.features.tools.bundles.everything.enable = lib.mkEnableOption "Tools";
@@ -18,6 +19,7 @@
         hyprshot.enable = lib.mkDefault true;
         portals.enable = lib.mkDefault true;
         mpv.enable = lib.mkDefault true;
+        qemu.enable = lib.mkDefault true;
       };
     };
   };
