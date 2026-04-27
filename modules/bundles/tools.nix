@@ -9,6 +9,7 @@
       self.nixosModules.portals
       self.nixosModules.mpv
       self.nixosModules.qemu
+      self.nixosModules.wshowkeys
     ];
     
     options.device.features.tools.bundles.everything.enable = lib.mkEnableOption "Tools";
@@ -20,6 +21,7 @@
         portals.enable = lib.mkDefault true;
         mpv.enable = lib.mkDefault true;
         qemu.enable = lib.mkDefault true;
+        wshowkeys.enable = lib.mkDefault true;
       };
     };
   };

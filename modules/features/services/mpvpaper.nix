@@ -21,7 +21,8 @@
             PartOf = [ "graphical-session.target" ];
           };
           Service = {
-            ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -o \"--hwdec=auto --vo=gpu --loop --no-audio\" '*' ${wallpaperPath}";
+            #ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -o \"--hwdec=auto --vo=gpu --loop --no-audio\" '*' ${wallpaperPath}";
+            ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -o \"--hwdec=auto --vo=gpu --loop --no-audio --cache=no --demuxer-max-bytes=1MiB --demuxer-max-back-bytes=1MiB --vd-lavc-dr=no\" '*' ${wallpaperPath}";
             Restart = "on-failure";
           };
           Install = {

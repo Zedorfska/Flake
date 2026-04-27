@@ -68,6 +68,7 @@
           portals.enable = true;
           mpv.enable = true;
           qemu.enable = false;
+          wshowkeys.enable = true;
         };
 
         software = {
@@ -85,6 +86,7 @@
           inkscape.enable = true;
           kdenlive.enable = true;
           obsidian.enable = true;
+          libreoffice.enable = true;
           blockbench.enable = true;
         };
 

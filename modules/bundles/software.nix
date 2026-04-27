@@ -7,6 +7,7 @@
       self.nixosModules.aseprite
       self.nixosModules.creative-bundle
       self.nixosModules.obsidian
+      self.nixosModules.libreoffice
       self.nixosModules.blockbench
     ];
     
@@ -17,6 +18,7 @@
         aseprite.enable = lib.mkDefault true;
         bundles.creative.enable = lib.mkDefault true;
         obsidian.enable = lib.mkDefault true;
+        libreoffice.enable = lib.mkDefault true;
         blockbench.enable = lib.mkDefault true;
       };
     };

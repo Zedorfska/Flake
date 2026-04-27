@@ -30,8 +30,8 @@
             };
 
             visuals = {
-              nvimWebDevicons.enable = true;
-              cursorline.enable = true;
+              nvim-web-devicons.enable = true;
+              nvim-cursorline.enable = true;
               indent-blankline.enable = true;
             };
             

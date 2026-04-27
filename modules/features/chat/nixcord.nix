@@ -5,10 +5,28 @@
     user = config.internal.username;
   in {
     options.device.features.chat.nixcord.enable = lib.mkEnableOption "Nixcord (Discord with Vencord/Equicord)";
-
     config = lib.mkIf cfg.enable {
-      home-manager.users.${user} = {
+      
+      device.features.tools.portals.enable = true;
+
+      home-manager.users.${user} = { lib, ...}: {
         imports = [ inputs.nixcord.homeModules.nixcord ];
+        
+        home.activation.equibopSettingsCleanup = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+          # This is so fucking evil but I literally dont care
+          rm -f "$HOME/.config/equibop/settings/settings.json.backup"
+        '';
+
+        home.activation.equibopSettings = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+          settingsDir="$HOME/.config/equibop/settings"
+          settingsFile="$settingsDir/settings.json"
+
+          mkdir -p "$settingsDir"
+          if [ -L "$settingsFile" ]; then
+            cp --remove-destination "$(readlink -f "$settingsFile")" "$settingsFile"
+            chmod 644 "$settingsFile"
+          fi
+        '';
 
         programs.nixcord = {
           enable = true;
@@ -18,8 +36,29 @@
               autoUpdate = true;
               autoUpdateNotification = false;
             };
+            package = pkgs.equibop.overrideAttrs (oldAttrs: {
+            nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [ pkgs.makeWrapper ];
+            postFixup = (oldAttrs.postFixup or "") + ''
+              wrapProgram $out/bin/equibop \
+                --add-flags "--ozone-platform-hint=auto" \
+                --add-flags "--enable-features=WaylandWindowDecorations,WebRTCPipeWireCapturer" \
+                --add-flags "--lang=en-UK" \
+                --set-default ELECTRON_OZONE_PLATFORM_HINT auto \
+                --set-default NVD_BACKEND direct \
+                --set-default __GLX_VENDOR_LIBRARY_NAME nvidia
+              ''; # EVIL UK
+            });
           };
-          
+
+          extraConfig = {
+              hardwareAcceleration = true;
+              video = {
+                remote_screenshare_optimization = true;
+                video_encoding = true;
+              };
+              DANGEROUS_ENABLE_DEVTOOLS_ONLY_ENABLE_IF_YOU_KNOW_WHAT_YOU_ARE_DOING = false;
+            };
+
           config = {
             # TODO: I am NOT indenting all of ts rn
             autoUpdate = false;
@@ -29,6 +68,7 @@
             useQuickCss = false;
             transparent = false;
 
+            
             plugins = {
 
               ###
@@ -140,7 +180,7 @@
               validUser.enable = true;
               youtubeAdblock.enable = true;
               webRichPresence.enable = false;
-              webScreenShareFixes.enable = false;
+              webScreenShareFixes.enable = false; # Vencord is web or whatever
               UserPFP = # TODO: setup
               {
                 enable = false;
@@ -683,10 +723,10 @@
                 enable = false;
                 disableH265Codec = true;
               };
+            };
           };
         };
       };
     };
   };
-};
 }
