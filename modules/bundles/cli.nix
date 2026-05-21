@@ -10,6 +10,8 @@
       self.nixosModules.tty-clock
       self.nixosModules.nvf
       self.nixosModules.yt-dlp
+      self.nixosModules.networkmanager
+      self.nixosModules.gitui
     ];
     
     options.device.features.cli.bundles.everything.enable = lib.mkEnableOption "CLI tools";
@@ -22,6 +24,8 @@
         tty-clock.enable = lib.mkDefault true;
         nvf.enable = lib.mkDefault true;
         yt-dlp.enable = lib.mkDefault true;
+        networkmanager.enable = lib.mkDefault true;
+        gitui.enable = lib.mkDefault true;
       };
     };
   };

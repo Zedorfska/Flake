@@ -3,6 +3,7 @@
   let
     cfg = config.device.features.browsers.librewolf;
     user = config.internal.username;
+    nasinNanpaFont = "${pkgs.nasin-nanpa}/share/fonts/opentype/nasin-nanpa.otf";
   in {
     options.device.features.browsers.librewolf.enable = lib.mkEnableOption "LibreWolf Browser";
 
@@ -22,6 +23,10 @@
             
             # Reload tabs automatically
             "browser.startup.page" = 3;
+
+            # sitelen pona
+            "security.fileuri.strict_origin_policy" = false;
+            "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
           };
 
           policies = {
@@ -34,6 +39,7 @@
                 install_url = "https://addons.mozilla.org/firefox/downloads/latest/sponsorblock/latest.xpi";
                 installation_mode = "force_installed";
               };
+
             };
 
             DisablePocket = true;
@@ -48,6 +54,24 @@
               ];
             };
           };
+
+          profiles.default = {
+            isDefault = true;
+            userContent = ''
+  @font-face {
+    font-family: "nasin-nanpa";
+    src: url("file://${nasinNanpaFont}");
+    unicode-range: U+F1900-U+F19FF;
+  }
+
+  @-moz-document url-prefix("") {
+    * {
+      font-family: inherit, "nasin-nanpa";
+    }
+  }
+'';
+          };
+
         };
       };
     };

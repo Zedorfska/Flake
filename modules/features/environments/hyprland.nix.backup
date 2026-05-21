@@ -1,0 +1,90 @@
+{ self, ... }: {
+  flake.nixosModules.hyprland = { config, lib, pkgs, ... }:
+  let
+    cfg  = config.device.features.environments.hyprland;
+    user = config.internal.username;
+    t    = config.device.twm;
+    k    = t.keybinds;
+    d    = t.defaults;
+
+    # Generate the Lua config as a Nix string
+    hyprlandLua = ''
+      local mod = "${k.mod}"
+
+      local terminal    = "${d.terminal}"
+      local menu        = "${d.menu}"
+      local fileManager = "${d.file_manager}"
+      local screenshot  = "${d.screenshot}"
+
+      -- Input
+      hl.config({
+        input = {
+          kb_layout  = "${config.services.xserver.xkb.layout}",
+          kb_options = "${config.services.xserver.xkb.options}",
+          accel_profile = "flat",
+          follow_mouse = 1,
+          sensitivity  = 0,
+        },
+      })
+
+      -- Keybinds: Apps
+      hl.bind(mod .. " + ${k.apps.terminal.key}",     hl.dsp.exec_cmd(terminal))
+      hl.bind(mod .. " + ${k.apps.menu.key}",         hl.dsp.exec_cmd(menu))
+      hl.bind(mod .. " + ${k.apps.file_manager.key}", hl.dsp.exec_cmd(fileManager))
+
+      -- Keybinds: Window actions
+      hl.bind(mod .. " + Q", hl.dsp.window.close())
+      hl.bind(mod .. " + SHIFT + Q", hl.dsp.window.kill())
+      hl.bind(mod .. " + V", hl.dsp.window.float({ action = "toggle" }))
+      hl.bind(mod .. " + J", hl.dsp.layout("togglesplit"))
+
+      -- Keybinds: Focus / Move / Swap / Resize
+      local dirs = { up = "up", down = "down", left = "left", right = "right" }
+      local resizeVals = {
+        up    = { x = 0,    y = -100 },
+        down  = { x = 0,    y = 100  },
+        left  = { x = -100, y = 0    },
+        right = { x = 100,  y = 0    },
+      }
+      for dir, hlDir in pairs(dirs) do
+        hl.bind(mod .. " + " .. dir,                             hl.dsp.focus({ direction = hlDir }))
+        hl.bind(mod .. " + ${k.moveMod} + " .. dir,              hl.dsp.window.move({ direction = hlDir }))
+        hl.bind(mod .. " + ${k.swapMod} + " .. dir,              hl.dsp.window.swap({ direction = hlDir }))
+        hl.bind(mod .. " + ${k.resizeMod} + " .. dir,            hl.dsp.window.resize(resizeVals[dir]))
+      end
+
+      -- Keybinds: Workspaces 1-10
+      for i = 1, 10 do
+        local key = i % 10
+        hl.bind(mod .. " + " .. key,               hl.dsp.focus({ workspace = i }))
+        hl.bind(mod .. " + ${k.moveMod} + " .. key, hl.dsp.window.move({ workspace = i }))
+      end
+
+      -- Keybinds: Special workspace
+      hl.bind(mod .. " + ${k.workspaces.sc1}", hl.dsp.workspace.toggle_special("magic"))
+      hl.bind(mod .. " + SHIFT + ${k.workspaces.sc1}", hl.dsp.window.move({ workspace = "special:magic" }))
+
+      -- Mouse binds
+      hl.bind(mod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
+      hl.bind(mod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+    '';
+  in {
+    imports = [ self.nixosModules.twm ];
+
+    options.device.features.environments.hyprland.enable =
+      lib.mkEnableOption "Hyprland Tiling Window Manager";
+
+    config = lib.mkIf cfg.enable {
+      programs.hyprland.enable = true;
+
+      home-manager.users.${user} = {
+        # Disable the home-manager Hyprland module so it doesn't generate a .conf
+        wayland.windowManager.hyprland.enable = false;
+
+        home.file.".config/hypr/hyprland.lua" = {
+          text = hyprlandLua;
+        };
+      };
+    };
+  };
+}

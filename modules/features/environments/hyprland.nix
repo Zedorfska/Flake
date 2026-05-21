@@ -1,94 +1,148 @@
 { self, ... }: {
-  flake.nixosModules.hyprland = { config, lib, pkgs, ... }: 
+  flake.nixosModules.hyprland = { config, lib, pkgs, ... }:
   let
-    cfg = config.device.features.environments.hyprland;
+    cfg  = config.device.features.environments.hyprland;
     user = config.internal.username;
-    
-    t = config.device.twm;
-    k = t.keybinds;
-    d = t.defaults;
+    t    = config.device.twm;
+    k    = t.keybinds;
+    d    = t.defaults;
 
-    # HELPER: A simpler binder for Hyprland's CSV-style syntax
-    # Usage: mkBind "MOD SHIFT" "KEY" "ACTION"
-    mkBind = mods: key: action: "${mods}, ${key}, ${action}";
+    hyprlandLua = ''
+      ---          ---
+      --- MONITORS --- TODO: FUCKKKKKKKKKKKKKK
+      ---          ---
+      hl.monitor({
+        output   = "DP-1",
+        mode     = "1920x1080@143.85Hz",
+        position = "0x0",
+        scale    = "auto",
+      })
+      hl.monitor({
+        output   = "HDMI-A-1",
+        mode     = "preferred",
+        position = "1920x15",
+        scale    = "auto",
+      })
 
-    # MAPPER: Automated directions (Focus, Move, Swap, Resize)
-    # This turns your 4 directions * 4 actions into a concise loop.
-    directionBinds = let
-      hyprDir = { up = "u"; down = "d"; left = "l"; right = "r"; };
-      resVal = { 
-        up    = "0 -100"; 
-        down  = "0 100"; 
-        left  = "-100 0"; 
-        right = "100 0"; 
-      };
-    in lib.concatMap (name: [
-      (mkBind k.mod k.directions.${name} "movefocus, ${hyprDir.${name}}")
-      (mkBind "${k.mod} ${k.moveMod}" k.directions.${name} "movewindow, ${hyprDir.${name}}")
-      (mkBind "${k.mod} ${k.swapMod}" k.directions.${name} "swapwindow, ${hyprDir.${name}}")
-      (mkBind "${k.mod} ${k.resizeMod}" k.directions.${name} "resizeactive, ${resVal.${name}}")
-    ]) [ "up" "down" "left" "right" ];
+      ---      ---
+      --- VARS ---
+      ---      ---
+      local mod = "${k.mod}"
 
-    # MAPPER: Automated Workspaces
-    # This generates binds for ws1-10 and the "Move to" variants
-    workspaceBinds = lib.concatMap (n: let 
-      ws = k.workspaces."ws${n}"; 
-    in [
-      (mkBind k.mod ws "workspace, ${n}")
-      (mkBind "${k.mod} ${k.moveMod}" ws "movetoworkspace, ${n}")
-    ]) (map toString (lib.range 1 10));
+      local terminal    = "${d.terminal}"
+      local menu        = "${d.menu}"
+      local fileManager = "${d.file_manager}"
+      local screenshot  = "${d.screenshot}"
 
+      ---       ---
+      --- INPUT ---
+      ---       ---
+      hl.config({
+        input = {
+          kb_layout  = "${config.services.xserver.xkb.layout}",
+          kb_options = "${config.services.xserver.xkb.options}",
+          accel_profile = "flat",
+          follow_mouse = 1,
+          sensitivity  = 0,
+        },
+      })
+
+      ---           ---
+      --- AUTOSTART ---
+      ---           ---
+      hl.on("hyprland.start", function()
+        hl.exec_cmd("systemctl --user import-environment HYPRLAND_INSTANCE_SIGNATURE && systemctl --user start hyprland-session-target")
+      end)
+      -- I am going to need someone to explain to me why on
+      -- gods green earth do I have to add this line manually?
+      -- I am irreparably angry
+
+      ---          ---
+      --- ENV VARS ---
+      ---          ---
+
+      ---          ---
+      --- KEYBINDS ---
+      ---          ---
+      hl.bind(mod .. " + ${k.apps.terminal.key}",     hl.dsp.exec_cmd(terminal))
+      hl.bind(mod .. " + ${k.apps.menu.key}",         hl.dsp.exec_cmd(menu))
+      hl.bind(mod .. " + ${k.apps.file_manager.key}", hl.dsp.exec_cmd(fileManager))
+      hl.bind(mod .. " + ${k.apps.screenshot.mod2} + ${k.apps.screenshot.key}", hl.dsp.exec_cmd(screenshot))
+
+      hl.bind(mod .. " + Q", hl.dsp.window.close())
+      hl.bind(mod .. " + SHIFT + Q", hl.dsp.window.kill())
+      hl.bind(mod .. " + V", hl.dsp.window.float({ action = "toggle" }))
+      hl.bind(mod .. " + J", hl.dsp.layout("togglesplit"))
+
+      local dirs = { up = "up", down = "down", left = "left", right = "right" }
+      local resizeVals = {
+        up    = { x = 0,    y = -100, relative = true },
+        down  = { x = 0,    y = 100,  relative = true },
+        left  = { x = -100, y = 0,    relative = true },
+        right = { x = 100,  y = 0,    relative = true },
+      }
+      for dir, hlDir in pairs(dirs) do
+        hl.bind(mod .. " + " .. dir,                   hl.dsp.focus({ direction = hlDir }))
+        hl.bind(mod .. " + ${k.moveMod} + " .. dir,    hl.dsp.window.move({ direction = hlDir }))
+        hl.bind(mod .. " + ${k.swapMod} + " .. dir,    hl.dsp.window.swap({ direction = hlDir }))
+        hl.bind(mod .. " + ${k.resizeMod} + " .. dir, hl.dsp.window.resize(resizeVals[dir]))
+      end
+
+      for i = 1, 9 do
+        local key = i % 10
+        hl.bind(mod .. " + " .. key,                   hl.dsp.focus({ workspace = i }))
+        hl.bind(mod .. " + ${k.moveMod} + " .. key,    hl.dsp.window.move({ workspace = i }))
+      end
+      hl.bind(mod .. " + D",                hl.dsp.focus({ workspace = 10 }))
+      hl.bind(mod .. " + ${k.moveMod} + D", hl.dsp.window.move({ workspace = 10 }))
+
+      hl.bind(mod .. " + ${k.workspaces.sc1}",         hl.dsp.workspace.toggle_special("magic"))
+      hl.bind(mod .. " + SHIFT + ${k.workspaces.sc1}", hl.dsp.window.move({ workspace = "special:magic" }))
+
+      hl.bind(mod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
+      hl.bind(mod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+
+      ---        ---
+      --- VISUAL ---
+      ---        ---
+
+      ---            ---
+      --- WORKSPACES ---
+      ---            ---
+
+      ---                                                             ---
+      --- GO THREE UPDATES IN A ROW WITHOUT BREAKING MY CONFIGURATION ---
+      ---                                                             ---
+      hl.config({
+        misc = {
+          force_default_wallpaper = 0,
+          disable_hyprland_logo   = true,
+        },
+      })
+    '';
   in {
-    imports = [
-      self.nixosModules.twm
-    ];
-    
-    options.device.features.environments.hyprland.enable = lib.mkEnableOption "Hyprland Tiling Window Manager";
+    imports = [ self.nixosModules.twm ];
 
+    options.device.features.environments.hyprland.enable =
+      lib.mkEnableOption "Hyprland Tiling Window Manager";
     config = lib.mkIf cfg.enable {
       programs.hyprland.enable = true;
-
       home-manager.users.${user} = {
-        wayland.windowManager.hyprland = {
-          enable = true;
-          settings = {
-            # Defined in twm.nix
-            "$mod" = k.mod;
-
-            bind = [
-              # --- App Launches (Intent-based) ---
-              (mkBind k.apps.terminal.mod1     k.apps.terminal.key     "exec, ${d.terminal}")
-              (mkBind k.apps.menu.mod1         k.apps.menu.key         "exec, ${d.menu}")
-              (mkBind k.apps.file_manager.mod1 k.apps.file_manager.key "exec, ${d.file_manager}")
-              (mkBind "${k.apps.screenshot.mod1}_${k.apps.screenshot.mod2}" k.apps.screenshot.key "exec, ${d.screenshot}")
-
-              # --- Essential Window Actions ---
-              (mkBind k.mod "Q" "killactive,")
-              (mkBind "${k.mod} SHIFT" "Q" "forcekillactive,")
-              (mkBind k.mod "V" "togglefloating,")
-              (mkBind k.mod "J" "togglesplit,")
-              
-              # --- Special Workspace (Magic) ---
-              (mkBind k.mod k.workspaces.sc1 "togglespecialworkspace, Magic")
-              (mkBind "${k.mod} SHIFT" k.workspaces.sc1 "movetoworkspace, special:Magic")
-            ] 
-            ++ directionBinds 
-            ++ workspaceBinds;
-
-            bindm = [
-              "$mod, mouse:272, movewindow"
-              "$mod, mouse:273, resizewindow"
-            ];
-
-            input = {
-              kb_layout = config.services.xserver.xkb.layout;
-              kb_options = config.services.xserver.xkb.options;
-              accel_profile = "flat";
-            };
-            # (lib.mkIf (config.device.features.services.swww.enable) "swww-daemon")
-          };
-        };
-      };
+  home.file.".config/hypr/hyprland.lua".text = hyprlandLua;
+  systemd.user.services.hyprland-session-target = {
+    Unit = {
+      Description = "Activate graphical-session.target for Hyprland";
+      ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";
+      After = [ "default.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "systemctl --user start graphical-session.target";
+      RemainAfterExit = true;
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
+};
     };
   };
 }

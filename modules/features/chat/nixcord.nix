@@ -3,6 +3,7 @@
   let
     cfg = config.device.features.chat.nixcord;
     user = config.internal.username;
+    nasinNanpaFont = "${pkgs.nasin-nanpa}/share/fonts/opentype/nasin-nanpa.otf";
   in {
     options.device.features.chat.nixcord.enable = lib.mkEnableOption "Nixcord (Discord with Vencord/Equicord)";
     config = lib.mkIf cfg.enable {
@@ -53,19 +54,31 @@
           extraConfig = {
               hardwareAcceleration = true;
               video = {
-                remote_screenshare_optimization = true;
-                video_encoding = true;
+                remote_screenshare_optimization = false;
+                video_encoding = false;
               };
               DANGEROUS_ENABLE_DEVTOOLS_ONLY_ENABLE_IF_YOU_KNOW_WHAT_YOU_ARE_DOING = false;
             };
 
+quickCss = ''
+  @font-face {
+    font-family: "nasin-nanpa";
+    src: url("file://${pkgs.nasin-nanpa}/share/fonts/opentype/nasin-nanpa.otf");
+    unicode-range: U+F1900-U+F19FF;
+  }
+
+  * {
+    font-family: inherit, "nasin-nanpa" !important;
+  }
+'';
+
           config = {
             # TODO: I am NOT indenting all of ts rn
-            autoUpdate = false;
+            autoUpdate = true;
             notifyAboutUpdates = false;
             autoUpdateNotification = false;
             frameless = true;
-            useQuickCss = false;
+            useQuickCss = true; # LON
             transparent = false;
 
             
@@ -180,7 +193,7 @@
               validUser.enable = true;
               youtubeAdblock.enable = true;
               webRichPresence.enable = false;
-              webScreenShareFixes.enable = false; # Vencord is web or whatever
+              webScreenShareFixes.enable = true; # Vencord is web or whatever
               UserPFP = # TODO: setup
               {
                 enable = false;
@@ -207,9 +220,12 @@
               {
                 enable = true;
 
-                completeAchievementQuestsInBackground = true;
-                completeGameQuestsInBackground = true;
-                completeVideoQuestsInBackground = true;
+                #completeAchievementQuestsInBackground = true;
+                #completeGameQuestsInBackground = true;
+                #completeVideoQuestsInBackground = true;
+                completeVideoQuestsQuicker = true;
+
+                autoCompleteQuestsSimultaneously = true;
                 disableQuestsEverything = true;
                 questButtonDisplay = "never";
               };
@@ -265,11 +281,11 @@
                 statusEmojis = false;
               };
               betterGifAltText.enable = true;
-              betterNotesBox =
-              {
-                enable = true;
-                hide = true;
-              };
+              #betterNotesBox =
+              #{
+              #  enable = true;
+              #  hide = true;
+              #};
               betterRoleContext.enable = true;
               betterRoleDot.enable = false;
               betterSettings.enable = true;
@@ -419,7 +435,7 @@
               cleanChannelName.enable = true;
               clickableRoles.enable = true;
               commandPalette.enable = false;
-              components.enable = false;
+              #components.enable = false;
               # Fuck you
               declutter =
                 {
@@ -457,7 +473,7 @@
                 {
                   enable = true;
                   showLanguage = true;
-                  showRepositoryTab = true;
+                  #showRepositoryTab = true; # FUCK
                   showStars = true;
                 };
               googleThat =
@@ -466,13 +482,13 @@
                   customEngineURL = "https://duckduckgo.com/";
                   defaultEngine = "DuckDuckGo";
                 };
-              guildTagSettings =
-                {
-                  enable = true;
-                  disableAdoptTagPrompt = true;
-                  #hideTags = false; # Commented out because a different mod does this
-                };
-              holyNotes.enable = false;
+              #guildTagSettings = # FUCK
+              #  {
+              #    enable = true;
+              #    disableAdoptTagPrompt = true;
+              #    #hideTags = false; # Commented out because a different mod does this
+              #  };
+              #holyNotes.enable = false; # FUCK
               iconViewer.enable = false;
               instantScreenshare.enable = false;
               invisibleChat =
@@ -509,7 +525,7 @@
                 {
                   enable = false;
 
-                  confidenceRequirement = "0.8";
+                  #confidenceRequirement = "0.8"; # FUCK
                   targetLanguage = "en";
                 };
               micLoopbackTester.enable = false;
@@ -671,15 +687,15 @@
                 {
                   enable = false;
                 };
-              voiceChannelLog =
-                {
-                  enable = false;
-                  ignoreBlockedUsers = false;
-                  mode = 1;
-                  voiceChannelChatSelf = true;
-                  voiceChannelChatSilent = false;
-                  voiceChannelChatSilentSelf = false;
-                };
+              #voiceChannelLog = # FUCK
+              #  {
+              #    enable = false;
+              #    ignoreBlockedUsers = false;
+              #    #mode = 1; # FUCK
+              #    #voiceChannelChatSelf = true; # FUCK
+              #    voiceChannelChatSilent = false;
+              #    voiceChannelChatSilentSelf = false;
+              #  };
 
               ###
               ### Audio

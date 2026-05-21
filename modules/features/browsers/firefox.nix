@@ -13,6 +13,20 @@
         programs.firefox = {
           enable = true;
         };
+
+#        home.file.".librewolf/${user}/chrome/userContent.css" = {
+#          text = ''
+#            @font-face {
+#              font-family: "neoletters";
+#              src: local("neoletters");
+#              unicode-range: U+F1900-U+F19FF;
+#            }
+
+#            * {
+#              font-family: inherit, "neoletters" !important;
+#            }
+#         '';
+#        };
       };
     };
   };

@@ -9,6 +9,7 @@
       self.nixosModules.obsidian
       self.nixosModules.libreoffice
       self.nixosModules.blockbench
+      self.nixosModules.godot
     ];
     
     options.device.features.software.bundles.everything.enable = lib.mkEnableOption "All software";
@@ -20,6 +21,7 @@
         obsidian.enable = lib.mkDefault true;
         libreoffice.enable = lib.mkDefault true;
         blockbench.enable = lib.mkDefault true;
+        godot.enable = lib.mkDefault true;
       };
     };
   };

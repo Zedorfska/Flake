@@ -44,6 +44,10 @@
           wofi.enable = true;
         };
 
+        programming = {
+          rust.enable = true;
+        };
+
         browsers = {
           librewolf.enable = true;
           firefox.enable = true;
@@ -60,6 +64,8 @@
           };
           nvf.enable = true;
           yt-dlp.enable = true;
+          networkmanager.enable = true;
+          gitui.enable = true;
         };
 
         tools = {
@@ -88,6 +94,7 @@
           obsidian.enable = true;
           libreoffice.enable = true;
           blockbench.enable = true;
+          godot.enable = true;
         };
 
         chat = {
@@ -139,6 +146,7 @@
       self.nixosModules.environments-bundle
       self.nixosModules.gaming-bundle
       self.nixosModules.launchers-bundle
+      self.nixosModules.programming-bundle
       self.nixosModules.services-bundle
       self.nixosModules.terminals-bundle
       self.nixosModules.tools-bundle

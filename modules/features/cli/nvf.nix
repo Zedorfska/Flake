@@ -2,6 +2,14 @@
   flake.nixosModules.nvf = { config, lib, pkgs, ... }: 
   let
     cfg = config.device.features.cli.nvf;
+
+    # TODO: Figure ts out
+    rust    = config.device.features.programming.rust.enable;
+    #lua     = config.device.features.programming.lua.enable;
+    #python  = config.device.features.programming.python.enable;
+    #csharp  = config.device.features.programming.csharp.enable;
+    nix     = true;
+
   in {
     imports = [ inputs.nvf.nixosModules.default ];
 
@@ -12,6 +20,28 @@
         enable = true;
         settings = {
           vim = {
+            ###
+            globals.mapleader = " ";
+            maps.normal = {
+              "<leader>e" = {
+              action = "<cmd>lua vim.diagnostic.open_float()<CR>";
+              desc = "Open diagnostic float";
+              };
+            };
+            autocmds = [
+              {
+                event = [ "FileType" ];
+                pattern = [ "nix" ];
+                command = "setlocal tabstop=2 shiftwidth=2 expandtab";
+              }
+              {
+                event = [ "FileType" ];
+                pattern = [ "rust" ];
+                command = "setlocal tabstop=4 shiftwidth=4 expandtab";
+              }
+            ];
+            ###
+
             viAlias = true;
             vimAlias = true;
             preventJunkFiles = true;
@@ -35,7 +65,13 @@
               indent-blankline.enable = true;
             };
             
-            globals.mapleader = " ";
+            languages = {
+              nix.enable  = nix;
+              rust.enable = rust;
+              #lua.enable    = lua; # TODO:
+              #python.enable = python;
+              #csharp.enable = csharp;
+            };
           };
         };
       };
