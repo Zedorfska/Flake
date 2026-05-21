@@ -51,12 +51,11 @@
       --- AUTOSTART ---
       ---           ---
       hl.on("hyprland.start", function()
-        os.execute("systemctl --user import-environment HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY DISPLAY XAUTHORITY")
-  os.execute("systemctl --user start graphical-session.target &")
+        hl.exec_cmd("systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP HYPRLAND_INSTANCE_SIGNATURE")
+        hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=hyprland HYPRLAND_INSTANCE_SIGNATURE")
+        hl.exec_cmd("systemctl --user start hyprland-session.target")
       end)
-      -- I am going to need someone to explain to me why on
-      -- gods green earth do I have to add this line manually?
-      -- I am irreparably angry
+
 
       ---          ---
       --- ENV VARS ---
@@ -126,11 +125,22 @@
 
     options.device.features.environments.hyprland.enable =
       lib.mkEnableOption "Hyprland Tiling Window Manager";
-    config = lib.mkIf cfg.enable {
-      programs.hyprland.enable = true;
-      home-manager.users.${user} = {
-  home.file.".config/hypr/hyprland.lua".text = hyprlandLua;
+      config = lib.mkIf cfg.enable {
+  programs.hyprland.enable = true;
+  home-manager.users.${user} = {
+    home.file.".config/hypr/hyprland.lua".text = hyprlandLua;
+
+    systemd.user.targets.hyprland-session = {
+      Unit = {
+        Description = "Hyprland compositor session";
+        Documentation = "man:systemd.special(7)";
+        BindsTo = [ "graphical-session.target" ];
+        Wants = [ "graphical-session-pre.target" ];
+        After = [ "graphical-session-pre.target" ];
       };
     };
+  };
+};
+
   };
 }
