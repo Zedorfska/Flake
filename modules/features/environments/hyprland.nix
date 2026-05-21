@@ -129,7 +129,7 @@
       programs.hyprland.enable = true;
       home-manager.users.${user} = {
   home.file.".config/hypr/hyprland.lua".text = hyprlandLua;
-  systemd.user.services.hyprland-session-target = {
+    systemd.user.services.hyprland-session-target = {
     Unit = {
       Description = "Activate graphical-session.target for Hyprland";
       ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";
@@ -140,9 +140,9 @@
       ExecStart = "systemctl --user start graphical-session.target";
       RemainAfterExit = true;
     };
-    Install.WantedBy = [ "default.target" ];
+    Install.WantedBy = [ "graphical-session.target" ];
   };
-};
+      };
     };
   };
 }
