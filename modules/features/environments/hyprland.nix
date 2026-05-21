@@ -51,7 +51,8 @@
       --- AUTOSTART ---
       ---           ---
       hl.on("hyprland.start", function()
-        hl.exec_cmd("systemctl --user import-environment HYPRLAND_INSTANCE_SIGNATURE && systemctl --user start hyprland-session-target")
+        os.execute("systemctl --user import-environment HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY DISPLAY XAUTHORITY")
+  os.execute("systemctl --user start graphical-session.target &")
       end)
       -- I am going to need someone to explain to me why on
       -- gods green earth do I have to add this line manually?
@@ -129,19 +130,6 @@
       programs.hyprland.enable = true;
       home-manager.users.${user} = {
   home.file.".config/hypr/hyprland.lua".text = hyprlandLua;
-    systemd.user.services.hyprland-session-target = {
-    Unit = {
-      Description = "Activate graphical-session.target for Hyprland";
-      ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";
-      After = [ "default.target" ];
-    };
-    Service = {
-      Type = "oneshot";
-      ExecStart = "systemctl --user start graphical-session.target";
-      RemainAfterExit = true;
-    };
-    Install.WantedBy = [ "graphical-session.target" ];
-  };
       };
     };
   };
