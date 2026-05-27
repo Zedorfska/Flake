@@ -6,6 +6,7 @@
     imports = [
       self.nixosModules.steam
       self.nixosModules.prism
+      self.nixosModules.wine
     ];
     
     options.device.features.gaming.bundles.everything.enable = lib.mkEnableOption "Launchers, etc.";
@@ -14,6 +15,7 @@
       device.features.gaming = {
         steam.enable = lib.mkDefault true;
         prism.enable = lib.mkDefault true;
+        wine.enable = lib.mkDefault true;
       };
     };
   };

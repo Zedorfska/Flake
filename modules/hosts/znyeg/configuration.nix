@@ -104,6 +104,7 @@
         gaming = {
           steam.enable = true;
           prism.enable = true;
+          wine.enable = true;
         };
 
         themes = {
