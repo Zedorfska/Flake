@@ -3,16 +3,20 @@
   flake.nixosModules.ZnyegConfiguration = { pkgs, ... }: {
     
     networking.hostName = "Znyeg";
-    
+    nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
     fileSystems."/mnt/nvme" = {
       device = "/dev/disk/by-uuid/95ee0e26-d3ca-4f07-b5ba-0343bc802a17";
       fsType = "ext4";
     };
-    
+
+    #swapDevices = [
+    #  { device = "/var/lib/swapfile"; size = 16*1024; }
+    #];
+
     system.stateVersion = "25.11";
     boot.loader.systemd-boot.enable = true;
-    nix.settings.experimental-features = [ "nix-command" "flakes" ];
-    
+        
     device.core.localisation.enable = true;
     device.features = {
 
@@ -70,7 +74,7 @@
 
         tools = {
           ffmpeg.enable = true;
-	  hyprshot.enable = true;
+	        hyprshot.enable = true;
           portals.enable = true;
           mpv.enable = true;
           qemu.enable = false;

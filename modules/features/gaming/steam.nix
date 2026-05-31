@@ -20,12 +20,6 @@
         enable32Bit = true;
       };
 
-      #hardware.opengl = {
-      #  enable = true;
-      #  driSupport = true;
-      #  driSupport32Bit = true;
-      #};
-
       hardware.steam-hardware.enable = true;
 
       environment.systemPackages = [ pkgs.gamescope ];
