@@ -17,7 +17,7 @@
       services     = lib.mkOption { type = lib.types.submodule {}; default = {}; };
       software     = lib.mkOption { type = lib.types.submodule {}; default = {}; };
       terminals    = lib.mkOption { type = lib.types.submodule {}; default = {}; };
-      theme        = lib.mkOption { type = lib.types.submodule {}; default = {}; };
+      themes       = lib.mkOption { type = lib.types.submodule {}; default = {}; };
       tools        = lib.mkOption { type = lib.types.submodule {}; default = {}; };
       filemanagers = lib.mkOption { type = lib.types.submodule {}; default = {}; };
     };

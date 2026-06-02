@@ -36,6 +36,7 @@
             settings = {
               autoUpdate = true;
               autoUpdateNotification = false;
+              richPresence = true;
             };
             package = pkgs.equibop.overrideAttrs (oldAttrs: {
             nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [ pkgs.makeWrapper ];
@@ -52,25 +53,27 @@
           };
 
           extraConfig = {
-              hardwareAcceleration = true;
-              video = {
-                remote_screenshare_optimization = false;
-                video_encoding = false;
-              };
-              DANGEROUS_ENABLE_DEVTOOLS_ONLY_ENABLE_IF_YOU_KNOW_WHAT_YOU_ARE_DOING = false;
+            hardwareAcceleration = true;
+            video = {
+              remote_screenshare_optimization = false;
+              video_encoding = false;
             };
+            DANGEROUS_ENABLE_DEVTOOLS_ONLY_ENABLE_IF_YOU_KNOW_WHAT_YOU_ARE_DOING = false;
 
-quickCss = ''
-  @font-face {
-    font-family: "nasin-nanpa";
-    src: url("file://${pkgs.nasin-nanpa}/share/fonts/opentype/nasin-nanpa.otf");
-    unicode-range: U+F1900-U+F19FF;
-  }
+            plugins.arRPCBun.enable = true;
+          };
 
-  * {
-    font-family: inherit, "nasin-nanpa" !important;
-  }
-'';
+            quickCss = ''
+              @font-face {
+                font-family: "nasin-nanpa";
+                src: url("file://${pkgs.nasin-nanpa}/share/fonts/opentype/nasin-nanpa.otf");
+                unicode-range: U+F1900-U+F19FF;
+              }
+          
+              * {
+                font-family: inherit, "nasin-nanpa" !important;
+              }
+            '';
 
           config = {
             # TODO: I am NOT indenting all of ts rn
@@ -192,7 +195,7 @@ quickCss = ''
               validReply.enable = true;
               validUser.enable = true;
               youtubeAdblock.enable = true;
-              webRichPresence.enable = false;
+              webRichPresence.enable = true; # IMPORTANT
               webScreenShareFixes.enable = true; # Vencord is web or whatever
               UserPFP = # TODO: setup
               {

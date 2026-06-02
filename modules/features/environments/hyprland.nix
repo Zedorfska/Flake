@@ -121,8 +121,6 @@
       })
     '';
   in {
-    imports = [ self.nixosModules.twm ];
-
     options.device.features.environments.hyprland.enable =
       lib.mkEnableOption "Hyprland Tiling Window Manager";
       config = lib.mkIf cfg.enable {

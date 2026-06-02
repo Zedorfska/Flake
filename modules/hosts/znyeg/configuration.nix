@@ -28,10 +28,12 @@
           kanshi.enable = true;
           pipewire.enable = true;
           mpvpaper.enable = true;
+          mprisence.enable = true;
         };
 
         environments = {
           hyprland.enable = true;
+          dwl.enable = true;
           #hevel.enable = false;
         };
 
