@@ -12,6 +12,7 @@
       self.nixosModules.swww #
       self.nixosModules.mpvpaper
       self.nixosModules.mprisence
+      self.nixosModules.phonto
     ];
     
     options.device.features.services.bundles.everything.enable = lib.mkEnableOption "Services";
@@ -26,6 +27,7 @@
         swww.enable = lib.mkDefault true; #
         mpvpaper.enable = lib.mkDefault true; #
         mprisence.enable = lib.mkDefault true;
+        phonto.enable = lib.mkDefault true;
       };
     };
   };

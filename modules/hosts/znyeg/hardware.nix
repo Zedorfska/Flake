@@ -12,6 +12,8 @@
     boot.kernelModules = [ ];
     boot.extraModulePackages = [ ];
 
+    boot.kernelParams = [ "video=DP-1:1920x1080@144" "video=HDMI-A-1:1680x1050@60" ];
+
     fileSystems."/" =
       { device = "/dev/disk/by-uuid/ae2ce549-230a-4d78-8f4f-e4e22bde1ef5";
         fsType = "ext4";

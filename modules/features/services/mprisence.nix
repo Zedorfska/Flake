@@ -9,16 +9,16 @@
 
     config = lib.mkIf cfg.enable {
       home-manager.users.${user} = {
-        home.packages = [ pkgs.mprisence pkgs.mpd-mpris ];
+        home.packages = [ pkgs.mprisence pkgs.mpd-mpris pkgs.arrpc ];
 
-        systemd.user.services.mprisence = {
+        systemd.user.services.arrpc = {
           Unit = {
-            Description = "mprisence Discord Rich Presence";
+            Description = "arRPC Discord Rich Presence Bridge";
             After = [ "graphical-session.target" ];
             PartOf = [ "graphical-session.target" ];
           };
           Service = {
-            ExecStart = "${pkgs.mprisence}/bin/mprisence";
+            ExecStart = "${pkgs.arrpc}/bin/arrpc";
             Restart = "on-failure";
             RestartSec = 5;
           };
@@ -35,6 +35,22 @@
           };
           Service = {
             ExecStart = "${pkgs.mpd-mpris}/bin/mpd-mpris";
+            Restart = "on-failure";
+            RestartSec = 5;
+          };
+          Install = {
+            WantedBy = [ "graphical-session.target" ];
+          };
+        };
+
+        systemd.user.services.mprisence = {
+          Unit = {
+            Description = "mprisence Discord Rich Presence";
+            After = [ "graphical-session.target" ]; 
+            PartOf = [ "graphical-session.target" ];
+          };
+          Service = {
+            ExecStart = "${pkgs.mprisence}/bin/mprisence";
             Restart = "on-failure";
             RestartSec = 5;
           };

@@ -18,6 +18,8 @@
     
     nixcord.url = "github:FlameFlag/nixcord";
     nvf.url = "github:notashelf/nvf";
+
+    phonto.url = "github:museslabs/phonto";
   };
   
   outputs = inputs:

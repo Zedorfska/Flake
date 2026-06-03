@@ -27,8 +27,9 @@
           swww.enable = false;
           kanshi.enable = true;
           pipewire.enable = true;
-          mpvpaper.enable = true;
+          mpvpaper.enable = false;
           mprisence.enable = true;
+          phonto.enable = true;
         };
 
         environments = {

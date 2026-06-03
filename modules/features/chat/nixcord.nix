@@ -60,7 +60,7 @@
             };
             DANGEROUS_ENABLE_DEVTOOLS_ONLY_ENABLE_IF_YOU_KNOW_WHAT_YOU_ARE_DOING = false;
 
-            plugins.arRPCBun.enable = true;
+            plugins.arRPCBun.enable = false; # this MUST be false because arRPCBun is ran elsewhere
           };
 
             quickCss = ''
