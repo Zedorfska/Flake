@@ -35,19 +35,19 @@
           ];
         };
 
-        #wayland.windowManager.hyprland.settings = { # FUUUUUUUCK
-        #  monitor = [
-        #    "DP-1,1920x1080@144,0x0,1"
-        #    "HDMI-A-1,preferred,1920x15,1"
-        #  ];
-        #  xwayland = {
-        #    force_zero_scaling = true;
-        #  };
-        #  xwaylandprimaryoutput = "DP-1";
-        #  exec-once = [
-        #    "${pkgs.xorg.xrandr}/bin/xrandr --output DP-1 --primary"
-        #  ];
-        #};
+        wayland.windowManager.hyprland.settings = { # FUUUUUUUCK
+          monitor = [
+            "DP-1,1920x1080@144,0x0,1"
+            "HDMI-A-1,preferred,1920x15,1"
+          ];
+          xwayland = {
+            force_zero_scaling = true;
+          };
+          xwaylandprimaryoutput = "DP-1";
+          exec-once = [
+            "${pkgs.xorg.xrandr}/bin/xrandr --output DP-1 --primary"
+          ];
+        };
       };
     };
   };
