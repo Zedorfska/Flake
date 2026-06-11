@@ -3,7 +3,7 @@
   let
     cfg = config.device.features.services.phonto;
     user = config.internal.username;
-    wallpaperPath = self.assets.wallpapers.scav;
+    wallpaperPath = self.assets.wallpapers.scavWebm;
     phontoPackage = inputs.phonto.packages.${pkgs.system}.default;
   in {
     options.device.features.services.phonto = {

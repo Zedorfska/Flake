@@ -16,10 +16,10 @@
     packages.dwl =
       let
         # Keep in sync with modules/configuration/twm.nix
-        terminal   = "kitty";
-        menu       = "wofi --show drun";
+        terminal    = "kitty";
+        menu        = "wofi --show drun";
         fileManager = "dolphin";
-        screenshot = "hyprshot -m region --clipboard-only";
+        screenshot  = "hyprshot -m region --clipboard-only";
 
         configH = pkgs.writeText "config.h" ''
           #define COLOR(hex) { ((hex >> 24) & 0xFF) / 255.0f, \

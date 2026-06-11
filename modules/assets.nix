@@ -12,6 +12,7 @@
         default = ../wallpapers/wallpaper.png;
         scav    = ../wallpapers/scav.mp4;
         scavImage = ../wallpapers/scav.png;
+        scavWebm = ../wallpapers/scav.webm;
       };
     };
   };
