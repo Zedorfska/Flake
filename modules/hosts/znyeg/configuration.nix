@@ -1,7 +1,7 @@
 { self, inputs, ... }: {
   
   flake.nixosModules.ZnyegConfiguration = { pkgs, ... }: {
-    boot.kernelPackages = pkgs.linuxPackages_testing;
+    boot.kernelPackages = pkgs.linuxPackages_latest;
 
     networking.hostName = "Znyeg";
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
