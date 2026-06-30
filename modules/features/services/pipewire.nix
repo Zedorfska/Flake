@@ -16,9 +16,9 @@
         jack.enable = true;       # Compatibility for Pro Audio apps
         
         # Optional: Enable the WirePlumber session manager explicitly if needed
-        # wireplumber.enable = true;
+        wireplumber.enable = true;
       };
-      
+
       environment.systemPackages = [ pkgs.pulsemixer ];
     };
   };
