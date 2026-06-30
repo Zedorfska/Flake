@@ -1,8 +1,5 @@
 { self, ... }: {
-  flake.nixosModules.services-bundle = { config, lib, ... }: 
-  let
-    cfg = config.device.features.services.bundles.everything;
-  in {
+  flake.nixosModules.services-bundle = { ... }: {
     imports = [
       self.nixosModules.dunst
       self.nixosModules.gpu-screen-recorder
@@ -14,21 +11,5 @@
       self.nixosModules.mprisence
       self.nixosModules.phonto
     ];
-    
-    options.device.features.services.bundles.everything.enable = lib.mkEnableOption "Services";
-
-    config = lib.mkIf cfg.enable {
-      device.features.services = {
-        dunst.enable = lib.mkDefault true;
-        gpu-screen-recorder.enable = lib.mkDefault true;
-        kanshi.enable = lib.mkDefault true; #
-        #mpd.enable = lib.mkDefault true;
-        pipewire.enable = lib.mkDefault true;
-        swww.enable = lib.mkDefault true; #
-        mpvpaper.enable = lib.mkDefault true; #
-        mprisence.enable = lib.mkDefault true;
-        phonto.enable = lib.mkDefault true;
-      };
-    };
   };
 }

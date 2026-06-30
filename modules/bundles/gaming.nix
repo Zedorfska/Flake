@@ -1,22 +1,10 @@
 { self, ... }: {
-  flake.nixosModules.gaming-bundle = { config, lib, ... }: 
-  let
-    cfg = config.device.features.gaming.bundles.everything;
-  in {
+  flake.nixosModules.gaming-bundle = { ... }: {
     imports = [
       self.nixosModules.steam
       self.nixosModules.prism
       self.nixosModules.wine
+      self.nixosModules.vintagestory
     ];
-    
-    options.device.features.gaming.bundles.everything.enable = lib.mkEnableOption "Launchers, etc.";
-
-    config = lib.mkIf cfg.enable {
-      device.features.gaming = {
-        steam.enable = lib.mkDefault true;
-        prism.enable = lib.mkDefault true;
-        wine.enable = lib.mkDefault true;
-      };
-    };
   };
 }

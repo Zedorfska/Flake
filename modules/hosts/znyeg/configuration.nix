@@ -1,7 +1,7 @@
 { self, inputs, ... }: {
   
   flake.nixosModules.ZnyegConfiguration = { pkgs, ... }: {
-    boot.kernelPackages = pkgs.linuxPackages_latest;
+    boot.kernelPackages = pkgs.linuxPackages_testing;
 
     networking.hostName = "Znyeg";
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -81,7 +81,7 @@
 	        hyprshot.enable = true;
           portals.enable = true;
           mpv.enable = true;
-          qemu.enable = false;
+          qemu.enable = true;
           wshowkeys.enable = true;
         };
 
@@ -113,6 +113,7 @@
           steam.enable = true;
           prism.enable = true;
           wine.enable = true;
+          vintagestory.enable = false;
         };
 
         themes = {

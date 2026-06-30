@@ -1,8 +1,5 @@
 { self, ... }: {
-  flake.nixosModules.software-bundle = { config, lib, ... }: 
-  let
-    cfg = config.device.features.software.bundles.everything;
-  in {
+  flake.nixosModules.software-bundle = { ... }: {
     imports = [
       self.nixosModules.aseprite
       self.nixosModules.creative-bundle
@@ -11,18 +8,5 @@
       self.nixosModules.blockbench
       self.nixosModules.godot
     ];
-    
-    options.device.features.software.bundles.everything.enable = lib.mkEnableOption "All software";
-
-    config = lib.mkIf cfg.enable {
-      device.features.software = {
-        aseprite.enable = lib.mkDefault true;
-        bundles.creative.enable = lib.mkDefault true;
-        obsidian.enable = lib.mkDefault true;
-        libreoffice.enable = lib.mkDefault true;
-        blockbench.enable = lib.mkDefault true;
-        godot.enable = lib.mkDefault true;
-      };
-    };
   };
 }

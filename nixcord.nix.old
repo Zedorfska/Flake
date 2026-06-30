@@ -31,7 +31,6 @@
 
         programs.nixcord = {
           enable = true;
-
           equibop = {
             enable = true;
             settings = {
@@ -53,25 +52,6 @@
             });
           };
 
-          legcord = {
-            enable = false;
-            # Optionally bundle Vencord or Equicord (also installs userPlugins)
-            vencord.enable = true;
-            equicord.enable = false;
-
-            settings = {
-              channel = "stable";
-              tray = "dynamic";
-              minimizeToTray = false;
-              mods = [ "vencord" ];
-              doneSetup = true;
-            };
-          };
-
-          dorion = {
-            enable = false;
-          };
-
           extraConfig = {
             hardwareAcceleration = true;
             video = {
@@ -80,20 +60,20 @@
             };
             DANGEROUS_ENABLE_DEVTOOLS_ONLY_ENABLE_IF_YOU_KNOW_WHAT_YOU_ARE_DOING = false;
 
-            #plugins.arRPCBun.enable = false; # this MUST be false because arRPCBun is ran elsewhere
+            plugins.arRPCBun.enable = false; # this MUST be false because arRPCBun is ran elsewhere
           };
 
-          quickCss = ''
-            @font-face {
-              font-family: "nasin-nanpa";
-              src: url("file://${pkgs.nasin-nanpa}/share/fonts/opentype/nasin-nanpa.otf");
-              unicode-range: U+F1900-U+F19FF;
-            }
-
-            * {
-              font-family: inherit, "nasin-nanpa" !important;
-            }
-          '';
+            quickCss = ''
+              @font-face {
+                font-family: "nasin-nanpa";
+                src: url("file://${pkgs.nasin-nanpa}/share/fonts/opentype/nasin-nanpa.otf");
+                unicode-range: U+F1900-U+F19FF;
+              }
+          
+              * {
+                font-family: inherit, "nasin-nanpa" !important;
+              }
+            '';
 
           config = {
             # TODO: I am NOT indenting all of ts rn
@@ -115,10 +95,29 @@
               {
                 enable = true;
 
-                enableDeleteOnClick = true;
-                enableDoubleClickToEdit = true;
-                enableDoubleClickToReply = true;
-                requireModifier = false;
+                disableInDms = false;
+                disableInSystemDms = true;
+                clickTimeout = 300;
+                selectionHoldTimeout = 300;
+                useSelectionForQuote = false;
+                deferDoubleClickForTriple = false;
+                quoteWithReply = true;
+                reactEmoji = "";
+
+                addAdditionalReacts = false;
+                additionalReactEmojis = "";
+
+                singleClickAction = "DELETE";
+                singleClickOthersAction = "DELETE";
+                singleClickModifier = "BACKSPACE";
+
+                doubleClickAction = "EDIT";
+                doubleClickOthersAction = "REPLY";
+                doubleClickHoldThreshold = 0;
+                doubleClickModifier = "NONE";
+
+                tripleClickAction = "NONE";
+                tripleClickModifier = "NONE";
               };
               middleClickTweaks =
               {
@@ -145,7 +144,7 @@
               # Keyboard
               revealAllSpoilers.enable = true;
               webKeybinds.enable = true;
-              recentDmSwitcher.enable = false;
+              RecentDMSwitcher.enable = false;
               betterPlusReacts.enable = true;
               frequentQuickSwitcher.enable = false;
               keyboardNavigation.enable = false;
@@ -171,8 +170,8 @@
                 role = false;        # Suppress role mentions
                 showAllChannels = true; # Show all channels
               };
-              reviewDb.enable = false;
-              clearUrls.enable = true;
+              ReviewDB.enable = false;
+              ClearURLs.enable = true;
               crashHandler.enable = true;
               disableCallIdle.enable = true;
               disableDeepLinks.enable = false;
@@ -198,7 +197,7 @@
               youtubeAdblock.enable = true;
               webRichPresence.enable = true; # IMPORTANT
               webScreenShareFixes.enable = true; # Vencord is web or whatever
-              userPfp = # TODO: setup
+              UserPFP = # TODO: setup
               {
                 enable = false;
                 #databaseSource = ""; TODO: doesnt work lol
@@ -256,14 +255,9 @@
               showMeYourName =
               {
                 enable = true;
-                #includedNames = "{display}";
-                #removeDuplicates = true;
-                #displayNameColor = "#c9cdfb";
-
-                mode = "user";
-                friendNicknames = "always";
-                displayNames = true;
-                inReplies = true;
+                includedNames = "{display}";
+                removeDuplicates = true;
+                displayNameColor = "#c9cdfb";
               };
               typingIndicator =
               {
@@ -278,7 +272,7 @@
                 showAvatars = true;
                 showRoleColors = false;
               };
-              mutualGroupDms.enable = true;
+              MutualGroupDMs.enable = true;
               accountPanelServerProfile.enable = true;
               alwaysAnimate =
               {
@@ -311,7 +305,7 @@
               fixSpotifyEmbeds.enable = true;
               forceOwnerCrown.enable = true;
               friendInvites.enable = true;
-              #friendsSince.enable = true;
+              friendsSince.enable = true;
               fullSearchContext.enable = true;
               fullUserInChatbox.enable = true;
               gameActivityToggle.enable = false;
@@ -416,8 +410,8 @@
               };
               volumeBooster.enable = true;
               webContextMenus.enable = true;
-              fullVcpfp.enable = true;
-              vcPanelSettings.enable = false;
+              FullVCPFP.enable = true;
+              VCPanelSettings.enable = false;
               alwaysExpandProfiles.enable = false;
               alwaysExpandRoles.enable = false;
               autoZipper =
@@ -457,9 +451,9 @@
                   removeGiftButton = true;
                   removeNameplate = true;
                   removeProfileEffect = true;
-                  removeQuestsAboveDms = true;
+                  removeQuestsAboveDM = true;
                   removeServerBoostInfo = true;
-                  removeShopAboveDms = true;
+                  removeShopAboveDM = true;
                   removeUnavailableEmojiPicker = true;
                 };
               noNitroUpsell.enable = true;
@@ -476,7 +470,6 @@
                   removeActivitySection = true;
                   restoreFileDownloadButton = true;
                   showYourOwnActivityButtons = false;
-                  disableAdoptTagPrompt = true;
                 };
               gifCollections.enable = false;
               gitHubRepos =
@@ -489,7 +482,7 @@
               googleThat =
                 {
                   enable = true;
-                  customEngineUrl = "https://duckduckgo.com/";
+                  customEngineURL = "https://duckduckgo.com/";
                   defaultEngine = "DuckDuckGo";
                 };
               #guildTagSettings = # FUCK
@@ -544,14 +537,14 @@
                 {
                   enable = false;
 
-                  #frequentEmojis = true;
-                  #compactMode = false;
+                  frequentEmojis = true;
+                  compactMode = false;
 
                   reactionCount = 5;
-                  #columns = 4.0;
-                  #rows = 2.0;
+                  columns = 4.0;
+                  rows = 2.0;
 
-                  #scroll = true;
+                  scroll = true;
                 };
               neverPausePreviews.enable = true;
               newPluginsManager.enable = true;
@@ -562,12 +555,12 @@
                 {
                   enable = true;
 
-                  #isKeybindEnabled = true;
-                  #messageAlignment = "topright";
-                  #messagesSemitransparent = false;
+                  isKeybindEnabled = true;
+                  messageAlignment = "topright";
+                  messagesSemitransparent = false;
                   port = 6888;
-                  #userAlignment = "topleft";
-                  #voiceSemitransparent = true;
+                  userAlignment = "topleft";
+                  voiceSemitransparent = true;
                 };
               pinIcon.enable = true;
               randomVoice = # TODO: yeah
@@ -613,9 +606,9 @@
                 };
               universalMention =
                 {
-                  enable = false;
+                  enable = true;
                   globalMention = false;
-                  onlyDmUsers = false;
+                  onlyDMUsers = false;
                 };
 
               ### 
@@ -631,8 +624,8 @@
                   collapseDeleted = false;
                   deleteStyle = "text";
                   inlineEdits = true;
-                  #showEditDiffs = false;
-                  #separatedDiffs = false;
+                  showEditDiffs = false;
+                  separatedDiffs = false;
 
                   ignoreBots = true;
                   ignoreChannels = "";
@@ -675,7 +668,7 @@
               showHiddenChannels.enable = false;
               permissionsViewer.enable = false;
               silentTyping.enable = false;
-              pinDms = { enable = true; };
+              PinDMs = { enable = true; };
               relationshipNotifier =
                 {
                   enable = true;
@@ -686,7 +679,7 @@
                   groups = true;
                   friendRequestCancels = true;
                 };
-              iRememberYou.enable = false;
+              IRememberYou.enable = false;
               keywordNotify =
                 {
                   enable = false;

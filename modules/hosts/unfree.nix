@@ -15,6 +15,12 @@
       "vscode-extension-ms-dotnettools-csharp"
       "vital"
       "obsidian"
+
+      "vintagestory"
+    ];
+    nixpkgs.config.permittedInsecurePackages = [
+      "librewolf-151.0.2-1"
+      "librewolf-unwrapped-151.0.2-1"
     ];
   };
 }
