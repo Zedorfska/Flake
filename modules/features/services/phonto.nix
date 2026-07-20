@@ -16,7 +16,7 @@
         gst-plugins-good
         gst-plugins-bad
         gst-plugins-ugly
-        gst-vaapi
+        #gst-vaapi
       ];
       home-manager.users.${user} = {
         systemd.user.services.phonto = {
@@ -29,7 +29,7 @@
             ExecStart = "${phontoPackage}/bin/phonto ${wallpaperPath}";
             Restart = "on-failure";
             Environment = [
-              "GST_PLUGIN_PATH=${pkgs.gst_all_1.gst-plugins-base}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-plugins-good}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-plugins-bad}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-plugins-ugly}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-vaapi}/lib/gstreamer-1.0"
+              "GST_PLUGIN_PATH=${pkgs.gst_all_1.gst-plugins-base}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-plugins-good}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-plugins-bad}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-plugins-ugly}/lib/gstreamer-1.0"
             ];
           };
           Install = {

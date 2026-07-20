@@ -7,6 +7,7 @@
       self.nixosModules.mpv
       self.nixosModules.qemu
       self.nixosModules.wshowkeys
+      self.nixosModules.protonhax
     ];
   };
 }

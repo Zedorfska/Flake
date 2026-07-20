@@ -25,7 +25,7 @@
               // # theme: "Zedorfska"
               ui: (
                 album_art_enabled: true,
-                album_art_display_strategy: "Kitty",
+                album_art_display_strategy: "Blocks",
               ),
               keybinds: (
                 global: {

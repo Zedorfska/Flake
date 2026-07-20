@@ -7,6 +7,7 @@
       self.nixosModules.libreoffice
       self.nixosModules.blockbench
       self.nixosModules.godot
+      self.nixosModules.ciscopackettracer
     ];
   };
 }

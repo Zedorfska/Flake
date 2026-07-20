@@ -586,7 +586,7 @@
               timezones =
                 {
                   enable = false;
-                  _24hTime = true;
+                  twentyFourHourFormat = true;
                   askedTimezone = false;
                   databaseUrl = "https://timezone.creations.works";
                   preferDatabaseOverLocal = true;
@@ -693,7 +693,7 @@
                   amountToKeep = 0;
                   ignoreBots = true;
                 };
-              vcNarratorCustom =
+              vcNarrator =
                 {
                   enable = false;
                 };

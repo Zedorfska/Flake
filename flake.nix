@@ -16,10 +16,12 @@
     
     #stylix.url = "github:danth/stylix";
     
-    nixcord.url = "github:FlameFlag/nixcord";
+    nixcord.url = "github:4evy/nixcord";
     nvf.url = "github:notashelf/nvf";
 
     phonto.url = "github:museslabs/phonto";
+
+    millenium.url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
   };
   
   outputs = inputs:

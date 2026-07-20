@@ -6,11 +6,9 @@
     networking.hostName = "Znyeg";
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-    fileSystems."/mnt/nvme" = {
-      device = "/dev/disk/by-uuid/95ee0e26-d3ca-4f07-b5ba-0343bc802a17";
-      fsType = "ext4";
-    };
 
+    networking.firewall.allowedTCPPorts = [ 25565 ]; # MC
+    networking.firewall.allowedUDPPorts = [ 24454 ]; # SVC
     #swapDevices = [
     #  { device = "/var/lib/swapfile"; size = 16*1024; }
     #];
@@ -81,8 +79,9 @@
 	        hyprshot.enable = true;
           portals.enable = true;
           mpv.enable = true;
-          qemu.enable = true;
+          qemu.enable = false;
           wshowkeys.enable = true;
+          protonhax.enable = true;
         };
 
         software = {
@@ -114,6 +113,7 @@
           prism.enable = true;
           wine.enable = true;
           vintagestory.enable = false;
+          bottles.enable = false;
         };
 
         themes = {
