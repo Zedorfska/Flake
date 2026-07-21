@@ -31,7 +31,7 @@
       fsType = "ext4";
     };
     fileSystems."/mnt/hdd" = {
-      device = "/dev/disk/by-uuid/5ec8c205-eb12-4372-87b9-f2f8535bd084";
+      device = "/dev/disk/by-uuid/44783bce-7340-493a-9997-f8af3e1e937d";
       fsType = "ext4";
     };
 
