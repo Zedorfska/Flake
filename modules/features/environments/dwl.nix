@@ -64,8 +64,19 @@
     swapC     = mkDirBinds kb.swapMod "swapdir";
     resizeC   = mkDirBinds kb.resizeMod "resizeclient";
 
+    # opacity keybinds — these are client-opacity-focus's own default binds
+    # (from its config.def.h hunk that applies cleanly); wired in here since
+    # generatedKeys already owns the "right after keys[] opens" insertion
+    # point, same reasoning as everything else in this block.
+    opacityKeysC = ''
+      	{ ${mkMod [ kb.mod "CONTROL" ]}, XKB_KEY_k, setopacityunfocus, {.f = +0.1f} },
+      	{ ${mkMod [ kb.mod "CONTROL" ]}, XKB_KEY_j, setopacityunfocus, {.f = -0.1f} },
+      	{ ${mkMod [ kb.mod "CONTROL" "SHIFT" ]}, XKB_KEY_K, setopacityfocus, {.f = +0.1f} },
+      	{ ${mkMod [ kb.mod "CONTROL" "SHIFT" ]}, XKB_KEY_J, setopacityfocus, {.f = -0.1f} },
+    '';
+
     generatedKeys = pkgs.writeText "dwl-generated-keys.h" ''
-      ${tagKeysC}${scratchC}${appsC}
+      ${tagKeysC}${scratchC}${appsC}${opacityKeysC}
     '';
 
     mkPatch = name: filename: hash: pkgs.fetchpatch {
@@ -74,13 +85,14 @@
       inherit hash;
     };
 
+    # applied manually in postPatch, not via `patches` — 4 of its 15 hunks
+    # conflict with namedscratchpads' struct extensions; see chat.
+    clientOpacityFocusPatch = mkPatch "client-opacity-focus" "client-opacity-focus.patch" "sha256-+0gaZ5vbZSuoGfxGsMnQcKd8rm44zSvNYI5G5bX864g=";
+
     dwlPatches = [
       (mkPatch "namedscratchpads" "namedscratchpads-0.8.patch" "sha256-o2+iSnlloZY1/GzEH1EIFurmM/j4I9qQ1LrVGIQA7nQ=")
       (mkPatch "dwindle" "dwindle.patch" "sha256-fwzvqhHXEPx44dOeTzluFRsIXiXRGZR9FA0db/dZVfM=")
       #./dwl-singletagset.patch
-
-      # names confirmed against the real repo now — just need exact filenames
-      #(mkPatch "client-opacity" "client-opacity.patch" "sha256-5vsBsvdwQ4Vj1aEQgKkhOIv1Huk+taAtXFw6s25Ld6M=")
       (mkPatch "smartborders" "smartborders.patch" "sha256-5vsBsvdwQ4Vj1aEQgKkhOIv1Huk+taAtXFw6s25Ld6M=")
 
       # blur: no scenefx patch exists anymore — dropped, see chat
@@ -94,6 +106,14 @@
     dwlPackage = pkgs.dwl.overrideAttrs (old: {
       patches = (old.patches or [ ]) ++ dwlPatches;
       postPatch = (old.postPatch or "") + ''
+        # apply client-opacity-focus permissively — 11 of its 15 hunks
+        # (opacity-rendering logic, Rule typedef extension, etc.) apply
+        # cleanly against the namedscratchpads-modified tree; the other 4
+        # conflict with namedscratchpads' own struct extensions and are
+        # hand-patched below instead. Watch for any NEW "FAILED" lines
+        # beyond the 4 known ones if dwl's nixpkgs version ever bumps.
+        patch -p1 < ${clientOpacityFocusPatch} || true
+
         cp config.def.h config.h
         sed -i 's/#define MODKEY WLR_MODIFIER_[A-Z]*/#define MODKEY ${modToC.${kb.mod}}/' config.h
         sed -i "s|static const char \*tags\[\] = {.*};|${tagsArrayC}|" config.h
@@ -107,6 +127,16 @@
         sed -i 's/resize(c, (struct wlr_box){nx, ny, nw, nh}, 0);/resize(c, (struct wlr_box){nx, ny, nw, nh}, 0, draw_borders);/' dwl.c
         sed -i 's/resize(c, (struct wlr_box){nx, ny, w, nh}, 0);/resize(c, (struct wlr_box){nx, ny, w, nh}, 0, draw_borders);/' dwl.c
         sed -i 's/resize(c, (struct wlr_box){nx, ny, nw, h}, 0);/resize(c, (struct wlr_box){nx, ny, nw, h}, 0, draw_borders);/' dwl.c
+
+        # client-opacity-focus gaps (hand-patched — see chat):
+        # Client struct — add opacity fields after scratchkey
+        sed -i 's/\tchar scratchkey;/\tchar scratchkey;\n\tfloat opacity;\n\tfloat opacity_focus;\n\tfloat opacity_unfocus;/' dwl.c
+        # applyrules() — assign them after scratchkey assignment
+        sed -i 's/c->scratchkey = r->scratchkey;/c->scratchkey = r->scratchkey;\n\t\t\tc->opacity_focus = r->opacity_focus;\n\t\t\tc->opacity_unfocus = r->opacity_unfocus;/' dwl.c
+        # rules[] — insert opacity columns between isfloating and monitor
+        sed -i 's|{ "Gimp_EXAMPLE",     NULL,         0,            1,           -1,     0   },|{ "Gimp_EXAMPLE",     NULL,         0,            1,           1.00,  0.20,  -1,     0   },|' config.h
+        sed -i 's|{ "firefox_EXAMPLE",  NULL,         1 << 8,       0,           -1,     0   },|{ "firefox_EXAMPLE",  NULL,         1 << 8,       0,           1.00,  1.00,  -1,     0   },|' config.h
+        sed -i "s|{ NULL,               \"scratchpad\", 0,            1,           -1,     's' },|{ NULL,               \"scratchpad\", 0,            1,           1.00,  1.00,  -1,     's' },|" config.h
       '';
     });
   in {
@@ -115,4 +145,4 @@
       programs.dwl = { enable = true; package = dwlPackage; };
     };
   };
-} 
+}
