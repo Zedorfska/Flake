@@ -7,8 +7,8 @@
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
 
-    networking.firewall.allowedTCPPorts = [ 25565 ]; # MC
-    networking.firewall.allowedUDPPorts = [ 24454 ]; # SVC
+    networking.firewall.allowedTCPPorts = [ 25565 2302 2303 2304 2305 2306 34567 ]; # MC
+    networking.firewall.allowedUDPPorts = [ 24454 2302 2303 2304 2305 2306 34567 ]; # SVC
     #swapDevices = [
     #  { device = "/var/lib/swapfile"; size = 16*1024; }
     #];
@@ -19,7 +19,8 @@
     device.core.localisation.enable = true;
     device.features = {
 
-        drivers.nvidia.enable = true;
+        drivers.nvidia.enable = false;
+        drivers.amd.enable = true;
 
         services = {
           gpu-screen-recorder.enable = true;
@@ -130,6 +131,7 @@
       # Hardware
       self.nixosModules.ZnyegHardware
       self.nixosModules.nvidia
+      self.nixosModules.amd
       self.nixosModules.localisation
       
       # Users

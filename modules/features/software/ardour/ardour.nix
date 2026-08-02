@@ -8,6 +8,10 @@
     activePackages = if pluginCfg.enable then pluginCfg.packages else [];
     
     #pluginBase = ./plugins; 
+
+    ardourWrapped = lib.hiPrio (pkgs.writeShellScriptBin "ardour9" ''
+      exec ${pkgs.pipewire.jack}/bin/pw-jack ${pkgs.ardour}/bin/ardour9 "$@"
+    '');
   in {
     imports = [ self.nixosModules.ardour-plugins ];
     
@@ -29,7 +33,7 @@
       users.users.${user}.extraGroups = [ "audio" ];
 
       home-manager.users.${user} = {
-        home.packages = [ pkgs.ardour ];
+        home.packages = [ pkgs.ardour ardourWrapped ];
         
         home.sessionVariables = {
           GDK_BACKEND = "x11";

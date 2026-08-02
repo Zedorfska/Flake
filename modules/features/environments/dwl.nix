@@ -79,6 +79,20 @@
       ${tagKeysC}${scratchC}${appsC}${opacityKeysC}
     '';
 
+    # singletagset's applyrules() addition — monitor-selection loop that
+    # runs after the rule-matching loop closes, right before setmon().
+    # Inserted via `r` since it's multi-line; see chat for why the
+    # multiline sed `s///` approach was abandoned earlier this thread.
+    singletagsetApplyRulesFix = pkgs.writeText "singletagset-applyrules-fix.h" ''
+      	wl_list_for_each(m, &mons, link) {
+      		// tag with different monitor selected by rules
+      		if (m->tagset[m->seltags] & newtags) {
+      			mon = m;
+      			break;
+      		}
+      	}
+    '';
+
     mkPatch = name: filename: hash: pkgs.fetchpatch {
       name = "dwl-${name}.patch";
       url = "${baseUrl}/${name}/${filename}";
@@ -89,14 +103,15 @@
     # conflict with namedscratchpads' struct extensions; see chat.
     clientOpacityFocusPatch = mkPatch "client-opacity-focus" "client-opacity-focus.patch" "sha256-+0gaZ5vbZSuoGfxGsMnQcKd8rm44zSvNYI5G5bX864g=";
 
+    # applied manually in postPatch — one hunk conflicts with
+    # namedscratchpads/client-opacity-focus in applyrules(); see chat.
+    singletagsetPatch = mkPatch "singletagset" "singletagset-v0.7.patch" "sha256-ppyLAdYIHOFCZ53/dBpxR3T3jSx5TfSApo0GI18M0tE=";
+
     dwlPatches = [
       (mkPatch "namedscratchpads" "namedscratchpads-0.8.patch" "sha256-o2+iSnlloZY1/GzEH1EIFurmM/j4I9qQ1LrVGIQA7nQ=")
       (mkPatch "dwindle" "dwindle.patch" "sha256-fwzvqhHXEPx44dOeTzluFRsIXiXRGZR9FA0db/dZVfM=")
-      #./dwl-singletagset.patch
       (mkPatch "smartborders" "smartborders.patch" "sha256-5vsBsvdwQ4Vj1aEQgKkhOIv1Huk+taAtXFw6s25Ld6M=")
-
       # blur: no scenefx patch exists anymore — dropped, see chat
-
       # deferred — separate patch-conflict issue
       # (mkPatch "focusdir" "focusdir.patch" "sha256-IY8NKUAJoK6lBPCl6CgQ1gFcMkqic9H4RmVs422yp7A=")
       # (mkPatch "swapandfocusdir" "swapandfocusdir.patch" "sha256-Xq3n8dqc3TJ11L10sWZpTBEbPs7g4DHHmtkd7yZbSw0=")
@@ -113,6 +128,11 @@
         # hand-patched below instead. Watch for any NEW "FAILED" lines
         # beyond the 4 known ones if dwl's nixpkgs version ever bumps.
         patch -p1 < ${clientOpacityFocusPatch} || true
+
+        # singletagset — 16 of 17 hunks apply clean; the applyrules() one
+        # conflicts with namedscratchpads/client-opacity-focus already
+        # occupying that function, same as above. Hand-fixed below.
+        patch -p1 < ${singletagsetPatch} || true
 
         cp config.def.h config.h
         sed -i 's/#define MODKEY WLR_MODIFIER_[A-Z]*/#define MODKEY ${modToC.${kb.mod}}/' config.h
@@ -137,6 +157,14 @@
         sed -i 's|{ "Gimp_EXAMPLE",     NULL,         0,            1,           -1,     0   },|{ "Gimp_EXAMPLE",     NULL,         0,            1,           1.00,  0.20,  -1,     0   },|' config.h
         sed -i 's|{ "firefox_EXAMPLE",  NULL,         1 << 8,       0,           -1,     0   },|{ "firefox_EXAMPLE",  NULL,         1 << 8,       0,           1.00,  1.00,  -1,     0   },|' config.h
         sed -i "s|{ NULL,               \"scratchpad\", 0,            1,           -1,     's' },|{ NULL,               \"scratchpad\", 0,            1,           1.00,  1.00,  -1,     's' },|" config.h
+
+        # singletagset gap: its applyrules() hunk conflicts with
+        # namedscratchpads/client-opacity-focus already occupying that
+        # function — same root cause as above. Insert its monitor-
+        # selection loop manually, then wire attachclients(mon) in after
+        # the existing setmon() call.
+        sed -i '/c->isfloating |= client_is_float_type(c);/r ${singletagsetApplyRulesFix}' dwl.c
+        sed -i 's/setmon(c, mon, newtags);/setmon(c, mon, newtags);\n\tattachclients(mon);/' dwl.c
       '';
     });
   in {
