@@ -9,9 +9,10 @@
 
     networking.firewall.allowedTCPPorts = [ 25565 2302 2303 2304 2305 2306 34567 ]; # MC
     networking.firewall.allowedUDPPorts = [ 24454 2302 2303 2304 2305 2306 34567 ]; # SVC
-    #swapDevices = [
-    #  { device = "/var/lib/swapfile"; size = 16*1024; }
-    #];
+
+    swapDevices = [
+      { device = "/var/lib/swapfile"; size = 8*1024; }
+    ];
 
     system.stateVersion = "25.11";
     boot.loader.systemd-boot.enable = true;

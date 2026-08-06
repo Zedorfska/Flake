@@ -305,7 +305,7 @@
               copyFileContents.enable = true;
               copyStickerLinks.enable = true;
               dontRoundMyTimestamps.enable = true;
-              favoriteGifSearch.enable = true;
+              # favoriteGifSearch.enable = true; # BROKEN
               fixCodeblockGap.enable = true;
               fixImagesQuality.enable = false;
               fixSpotifyEmbeds.enable = true;
