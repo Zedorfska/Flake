@@ -4,6 +4,7 @@
     cfg = config.device.features.cli.nvf;
 
     # TODO: Figure ts out
+    bash    = true;
     rust    = config.device.features.programming.rust.enable;
     #lua     = config.device.features.programming.lua.enable;
     #python  = config.device.features.programming.python.enable;
@@ -71,6 +72,7 @@
             };
             
             languages = {
+              bash.enable = bash;
               nix.enable  = nix;
               rust.enable = rust;
               #lua.enable    = lua; # TODO:

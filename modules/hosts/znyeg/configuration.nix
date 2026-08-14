@@ -51,11 +51,14 @@
 
         launchers = {
           wofi.enable = true;
+          wmenu.enable = true;
         };
 
         programming = {
           rust.enable = true;
         };
+
+        scripts.enable = true;
 
         browsers = {
           librewolf.enable = true;
@@ -158,6 +161,7 @@
       self.nixosModules.gaming-bundle
       self.nixosModules.launchers-bundle
       self.nixosModules.programming-bundle
+      self.nixosModules.scripts
       self.nixosModules.services-bundle
       self.nixosModules.terminals-bundle
       self.nixosModules.tools-bundle

@@ -41,10 +41,12 @@ compress_file() {
     local BASENAME="${FILENAME%.*}"
     local OUTPUT_FILE="${DIR}/${PREFIX}${BASENAME}${SUFFIX}.${EXTENSION}"
 
-    local DURATION=$(ffprobe -v error -show_entries format=duration \
+    local DURATION
+    DURATION=$(ffprobe -v error -show_entries format=duration \
         -of default=noprint_wrappers=1:nokey=1 "$1")
 
-    local VIDEO_BITRATE=$(awk -v size="$TARGET_SIZE_MB" -v dur="$DURATION" \
+    local VIDEO_BITRATE
+    VIDEO_BITRATE=$(awk -v size="$TARGET_SIZE_MB" -v dur="$DURATION" \
         'BEGIN { printf "%.0f", (size * 8 * 1000000) / dur }')
 
     ffmpeg -i "$1" -b:v "$VIDEO_BITRATE" -maxrate "$VIDEO_BITRATE" -bufsize "$VIDEO_BITRATE" \
@@ -52,7 +54,8 @@ compress_file() {
 }
 
 process_single_file() {
-    local FILESIZE=$(wc -c < "$1")
+    local FILESIZE
+    FILESIZE=$(wc -c < "$1")
 
     if (( FILESIZE > TARGET_SIZE_BYTES )); then
         if compress_file "$1"; then
@@ -67,7 +70,7 @@ process_single_file() {
 }
 
 get_files() {
-    local FILES=(*.$1)
+    local FILES=(*."$1")
     local AMOUNT_FILES=${#FILES[@]}
     if (( AMOUNT_FILES != 0 )); then
         echo "Found $AMOUNT_FILES *.$1 files"
