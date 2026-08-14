@@ -4,7 +4,7 @@
     cfg = config.device.features.software.aseprite;
     user = config.internal.username;
     asepritePkgs = import inputs.nixpkgs-aseprite {
-      system = pkgs.system;
+      system = pkgs.stdenv.hostPlatform.system;
       config.allowUnfree = true;
     };
   in {

@@ -27,6 +27,6 @@
       };
     };
 
-    packages.default = self.packages.${pkgs.system}.niri;
+    packages.default = self.packages.${pkgs.stdenv.hostPlatform.system}.niri;
   };
 }
