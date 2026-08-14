@@ -13,6 +13,8 @@
         git
         wget
         unzip
+
+        qdiskinfo
       ];
     };
   };

@@ -32,6 +32,11 @@
         programs.nixcord = {
           enable = true;
 
+          discord = {
+            enable = true;
+            vencord.enable = true;
+          };
+
           equibop = {
             enable = true;
             settings = {
@@ -56,7 +61,7 @@
           legcord = {
             enable = false;
             # Optionally bundle Vencord or Equicord (also installs userPlugins)
-            vencord.enable = true;
+            vencord.enable = false;
             equicord.enable = false;
 
             settings = {
@@ -189,7 +194,7 @@
               {
                 enable = true;
                 customEngineName = "DuckDuckGo";
-                customEngineURL = "https://duckduckgo.com/";
+                customEngineUrl = "https://duckduckgo.com/";
                 replacementEngine = "off";
               };
               spotifyCrack.enable = true;

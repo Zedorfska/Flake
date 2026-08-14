@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+
+shopt -s nullglob
+
+TARGET_SIZE_MB=9.5
+DO_REPLACE="FALSE"
+PREFIX=""
+SUFFIX="_compressed"
+MAX_JOBS=8
+
+VIDEO_FILETYPES=("mp4" "mov" "webm" "mkv" "avi")
+VIDEOS=()
+
+print_usage() {
+    echo "Usage: $0 [-m size_mb] [-j max_jobs] [-p prefix] [-s suffix] [-r]"
+    echo "  -m    Desired filesize (M) [default: $TARGET_SIZE_MB]"
+    echo "  -j    Max concurrent compression jobs [default: $MAX_JOBS]"
+    echo "  -p    Prefix for compressed clips [default: \"$PREFIX\"]"
+    echo "  -s    Suffix for compressed clips [default: \"$SUFFIX\"]"
+    echo "  -r    Replace original files after successful compression instead"
+    echo "  -h    Print this message"
+}
+
+while getopts "m:j:p:s:rh" FLAG; do
+    case "${FLAG}" in
+        h) print_usage; exit 1;;
+        m) TARGET_SIZE_MB="${OPTARG}" ;;
+        j) MAX_JOBS="${OPTARG}" ;;
+        p) PREFIX="${OPTARG}" ;;
+        s) SUFFIX="${OPTARG}" ;;
+        r) DO_REPLACE="TRUE" ;;
+        *) print_usage; exit 1;;
+    esac
+done
+
+compress_file() {
+    local DIR="."
+    [[ "$1" == *"/"* ]] && DIR="${1%/*}"
+    local FILENAME="${1##*/}"
+    local EXTENSION="${FILENAME##*.}"
+    local BASENAME="${FILENAME%.*}"
+    local OUTPUT_FILE="${DIR}/${PREFIX}${BASENAME}${SUFFIX}.${EXTENSION}"
+
+    local DURATION=$(ffprobe -v error -show_entries format=duration \
+        -of default=noprint_wrappers=1:nokey=1 "$1")
+
+    local VIDEO_BITRATE=$(awk -v size="$TARGET_SIZE_MB" -v dur="$DURATION" \
+        'BEGIN { printf "%.0f", (size * 8 * 1000000) / dur }')
+
+    ffmpeg -i "$1" -b:v "$VIDEO_BITRATE" -maxrate "$VIDEO_BITRATE" -bufsize "$VIDEO_BITRATE" \
+        -movflags +faststart "$OUTPUT_FILE" > /dev/null 2>&1
+}
+
+process_single_file() {
+    local FILESIZE=$(wc -c < "$1")
+
+    if (( FILESIZE > TARGET_SIZE_BYTES )); then
+        if compress_file "$1"; then
+            echo -e "[ \033[0;32mDONE\033[0m ] - $1"
+            [[ "$DO_REPLACE" == "TRUE" ]] && rm -- "$1"
+        else
+            echo -e "[ \033[0;31mFAIL\033[0m ] - $1"
+        fi
+    else
+        echo -e "[ \033[0;33mSKIP\033[0m ] - $1"
+    fi
+}
+
+get_files() {
+    local FILES=(*.$1)
+    local AMOUNT_FILES=${#FILES[@]}
+    if (( AMOUNT_FILES != 0 )); then
+        echo "Found $AMOUNT_FILES *.$1 files"
+    fi
+    VIDEOS+=("${FILES[@]}")
+}
+
+###       ###
+### LOGIC ###
+###       ###
+
+TARGET_SIZE_BYTES=$(awk -v mb="$TARGET_SIZE_MB" 'BEGIN { printf "%.0f", mb * 1024 * 1024 }')
+
+if (( $# == 0 )); then
+    echo "Compressing all videos in $(pwd)"
+    for FILETYPE in "${VIDEO_FILETYPES[@]}"; do
+        get_files "$FILETYPE"
+    done
+else
+    echo "Compressing selected videos."
+    for FILE in "$@"; do
+        if [[ ! -f $FILE ]]; then
+            echo -e "[ \033[0;31mFAIL\033[0m ] - File \"$FILE\" does not exist."
+            continue
+        fi
+        VIDEOS+=("${FILE[@]}")
+    done
+fi
+
+TOTAL_VIDEO_FILES="${#VIDEOS[@]}"
+    if (( TOTAL_VIDEO_FILES == 0 )); then
+        echo "Nothing to compress!"
+        exit 2
+    fi
+    echo "Total of $TOTAL_VIDEO_FILES videos selected."
+
+for FILE in "${VIDEOS[@]}"; do
+    process_single_file "$FILE" &
+
+    while (( $(jobs -r -p | wc -l) >= MAX_JOBS )); do
+        wait -n 2>/dev/null || true
+    done
+done
+
+wait
+
+echo ""
+echo "Finished in ...."
+exit 0

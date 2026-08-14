@@ -8,6 +8,7 @@
       "nvidia-kernel-modules"
       "discord"
       "discord-gamesdk"
+      "discord-unwrapped"
       "steam"
       "steam-unwrapped"
       "steamcmd"

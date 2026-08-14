@@ -31,6 +31,7 @@
           mpvpaper.enable = false;
           mprisence.enable = true;
           phonto.enable = true;
+          hyprpolkitagent.enable = true;
         };
 
         environments = {
@@ -104,6 +105,7 @@
           libreoffice.enable = true;
           blockbench.enable = true;
           godot.enable = true;
+          sunshine.enable = true;
         };
 
         chat = {
@@ -123,11 +125,7 @@
           #stylix.enable = true;
         };
     };
-    
-    environment.variables = {
-      WLR_NO_HARDWARE_CURSORS = "1";
-    };
-    
+   
     imports = [
       # Hardware
       self.nixosModules.ZnyegHardware
@@ -167,6 +165,3 @@
     ];
   };
 }
-
-
-

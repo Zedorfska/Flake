@@ -39,6 +39,11 @@
                 pattern = [ "rust" ];
                 command = "setlocal tabstop=4 shiftwidth=4 expandtab";
               }
+              {
+                event = [ "FileType" ];
+                pattern = [ "sh" "bash" ];
+                command = "setlocal tabstop=4 shiftwidth=4 expandtab";
+              }
             ];
             ###
 

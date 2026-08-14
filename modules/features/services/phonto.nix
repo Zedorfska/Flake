@@ -4,7 +4,7 @@
     cfg = config.device.features.services.phonto;
     user = config.internal.username;
     wallpaperPath = self.assets.wallpapers.scavWebm;
-    phontoPackage = inputs.phonto.packages.${pkgs.system}.default;
+    phontoPackage = inputs.phonto.packages.${pkgs.stdenv.hostPlatform.system}.default;
   in {
     options.device.features.services.phonto = {
       enable = lib.mkEnableOption "Phonto";

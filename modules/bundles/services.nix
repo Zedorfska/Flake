@@ -10,6 +10,7 @@
       self.nixosModules.mpvpaper
       self.nixosModules.mprisence
       self.nixosModules.phonto
+      self.nixosModules.hyprpolkitagent
     ];
   };
 }
