@@ -15,6 +15,10 @@
 
         xdg.configFile."fastfetch/config.jsonc".text = ''
           {
+            "general": {
+              "detectVersion": false,
+              "dsForceDrm": true
+            },
             "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
             "logo": {
                 "type": "auto",
@@ -27,21 +31,53 @@
             "modules": [
               "title",
               "separator",
-              "os",
-              "host",
+              {
+                "type": "os",
+                "format": "{pretty-name}"
+              },
+              /*"host",*/
               "kernel",
               "uptime",
-              "packages",
-              "shell",
-              "display",
-              "de",
-              "wm",
-              "gpu",
-              "cpu",
-              "memory",
-              "disk",
-              "localip",
-              /*"terminal",*/
+              /*"packages",*/
+              {
+                "type": "shell",
+                "format": "{pretty-name}"
+              },
+              /*{
+                "type": "display",
+                "format": "{width}x{height} @ {refresh-rate}Hz"
+              },*/
+              /*"de",*/
+              {
+                "type": "wm",
+                "detectPlugin": false,
+                "format": "{pretty-name}"
+              },
+              {
+                "type": "gpu",
+                "format": "{name}"
+              },
+              {
+                "type": "cpu",
+                "format": "{name} ({cores-logical}) @ {freq-max}"
+              },
+              {
+                "type": "memory",
+                "format": "{used} / {total} ({percentage})"
+              },
+              {
+                "type": "disk",
+                "format": "{size-used} / {size-total} ({size-percentage})"
+              },
+              {
+                "type": "localip",
+                "format": "{ipv4}"
+              },
+              /*{
+                "type": "publicip",
+                "format": "{ip}"
+              },*/
+              "terminal",
               "break",
               "colors"
             ]
