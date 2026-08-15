@@ -6,9 +6,13 @@
     networking.hostName = "Znyeg";
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-
     networking.firewall.allowedTCPPorts = [ 25565 2302 2303 2304 2305 2306 34567 ]; # MC
     networking.firewall.allowedUDPPorts = [ 24454 2302 2303 2304 2305 2306 34567 ]; # SVC
+
+    environment.variables = {
+      EDITOR = "nvim";
+      BROWSER = "firefox";
+    };
 
     swapDevices = [
       { device = "/var/lib/swapfile"; size = 8*1024; }
