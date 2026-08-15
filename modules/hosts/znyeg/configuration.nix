@@ -1,6 +1,6 @@
 { self, inputs, ... }: {
   
-  flake.nixosModules.ZnyegConfiguration = { pkgs, ... }: {
+  flake.nixosModules.ZnyegConfiguration = { pkgs, lib, config, ... }: {
     boot.kernelPackages = pkgs.linuxPackages_latest;
 
     networking.hostName = "Znyeg";
@@ -10,13 +10,9 @@
     networking.firewall.allowedUDPPorts = [ 24454 2302 2303 2304 2305 2306 34567 ]; # SVC
 
     environment.variables = {
-      EDITOR = "nvim";
-      BROWSER = "firefox";
+      #$EDITOR is defined in nvf.nix for when nvim is default
+      BROWSER = lib.mkIf config.device.features.browsers.firefox.enable "firefox";
     };
-
-    swapDevices = [
-      { device = "/var/lib/swapfile"; size = 8*1024; }
-    ];
 
     system.stateVersion = "25.11";
     boot.loader.systemd-boot.enable = true;
