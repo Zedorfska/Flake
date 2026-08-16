@@ -6,8 +6,14 @@
     networking.hostName = "Znyeg";
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-    networking.firewall.allowedTCPPorts = [ 25565 2302 2303 2304 2305 2306 34567 ]; # MC
-    networking.firewall.allowedUDPPorts = [ 24454 2302 2303 2304 2305 2306 34567 ]; # SVC
+    networking.firewall.allowedTCPPorts = [
+      25565 # Minecraft
+      47984 47989 48010 # Sunshine
+    ];
+    networking.firewall.allowedUDPPorts = [
+      24454 # SVC
+      47998 47999 48000 48002 48010 # Sunshine
+    ];
 
     environment.variables = {
       #$EDITOR is defined in nvf.nix for when nvim is default

@@ -28,18 +28,6 @@
             home.username = name;
             home.homeDirectory = "/home/${name}";
             home.stateVersion = "26.05";
-          
-            #imports = with self.modules.homeManager; [
-            #  theme
-            #  hyprland
-            #  swww
-            #  wofi
-            #  kitty
-            #  firefox
-            #  rmpc
-            #  nixcord
-            #  kanshi
-            #];
           };
         };
       };
