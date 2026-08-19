@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+AUDIO_FILETYPES=("mp3" "wav" "m4a" "flac" "aac" "ogg" "alac" "aiff")
+
+debandcampify() {
+    for FILE in "$1"/*; do
+        EXTENSION="${FILE##*.}"
+        for T in "${AUDIO_FILETYPES[@]}"; do
+            if [[ "$EXTENSION" == "$T" ]]; then
+                NEWFILE="${FILE##* - }"
+                if [[ "$NEWFILE" != "$FILE" ]]; then
+                    mv "$FILE" "$NEWFILE"
+                fi
+                break
+            fi
+        done
+    done
+}
+
+if [[ -z "${1:-}" ]]; then
+    debandcampify "$(pwd)"
+else
+    debandcampify "$1"
+fi
+
+echo "done"
+exit 0

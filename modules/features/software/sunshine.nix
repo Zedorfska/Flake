@@ -12,6 +12,7 @@
       home-manager.users.${user}.xdg.configFile."sunshine/sunshine.conf".text = ''
         address_family = ipv4
         mouse = disabled
+        output_name = DP-1
       '';
     };
   };

@@ -6,7 +6,7 @@
     # TODO: Figure ts out
     bash    = true;
     rust    = config.device.features.programming.rust.enable;
-    #lua     = config.device.features.programming.lua.enable;
+    lua     = true; #config.device.features.programming.lua.enable;
     #python  = config.device.features.programming.python.enable;
     #csharp  = config.device.features.programming.csharp.enable;
     nix     = true;
@@ -46,6 +46,11 @@
                 pattern = [ "sh" "bash" ];
                 command = "setlocal tabstop=4 shiftwidth=4 expandtab";
               }
+              {
+                event = [ "FileType" ];
+                pattern = [ "lua" ];
+                command = "setlocal tabstop=2 shiftwidth=2 expandtab";
+              }
             ];
             ###
 
@@ -76,7 +81,7 @@
               bash.enable = bash;
               nix.enable  = nix;
               rust.enable = rust;
-              #lua.enable    = lua; # TODO:
+              lua.enable  = lua;
               #python.enable = python;
               #csharp.enable = csharp;
             };

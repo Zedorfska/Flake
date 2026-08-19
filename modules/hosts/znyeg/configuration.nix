@@ -7,6 +7,8 @@
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
     networking.firewall.allowedTCPPorts = [
+      443 80 # Webserver
+      8100 # Bluemap
       25565 # Minecraft
       47984 47989 48010 # Sunshine
     ];
@@ -34,10 +36,14 @@
           swww.enable = false;
           kanshi.enable = true;
           pipewire.enable = true;
+          mpd = {
+            enable = true;
+            musicDirectory = "/mnt/hdd/music";
+          };
           mpvpaper.enable = false;
           mprisence.enable = true;
           phonto.enable = true;
-          hyprpolkitagent.enable = true;
+          hyprpolkitagent.enable = false;
         };
 
         environments = {

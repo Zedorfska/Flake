@@ -78,10 +78,6 @@ get_files() {
     VIDEOS+=("${FILES[@]}")
 }
 
-###       ###
-### LOGIC ###
-###       ###
-
 TARGET_SIZE_BYTES=$(awk -v mb="$TARGET_SIZE_MB" 'BEGIN { printf "%.0f", mb * 1024 * 1024 }')
 
 if (( $# == 0 )); then

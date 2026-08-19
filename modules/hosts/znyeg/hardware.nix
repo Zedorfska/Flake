@@ -34,6 +34,14 @@
       device = "/dev/disk/by-uuid/44783bce-7340-493a-9997-f8af3e1e937d";
       fsType = "ext4";
     };
+    systemd.tmpfiles.rules = [
+      "z /mnt/nvme 0755 ${config.internal.username} users - -"
+      "z /mnt/hdd  0755 ${config.internal.username} users - -"
+    ];
+    systemd.services.systemd-tmpfiles-setup = {
+      after = [ "mnt-nvme.mount" "mnt-hdd.mount" ];
+      requires = [ "mnt-nvme.mount" "mnt-hdd.mount" ];
+    };
 
     swapDevices = [
       { device = "/var/lib/swapfile"; size = 8*1024; }

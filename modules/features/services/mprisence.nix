@@ -98,6 +98,9 @@
           app_id = "1126153268486213672"
           icon = "https://www.musicpd.org/logo.png"
           show_icon = true
+
+          [web_player.youtube]
+          ignore = true
         '';
       };
     };
