@@ -56,6 +56,10 @@
           dolphin.enable = true;
         };
 
+        shells = {
+          mksh.enable = true;
+        };
+
         terminals = {
           kitty.enable = true;
           foot.enable = true;
@@ -175,6 +179,7 @@
       self.nixosModules.programming-bundle
       self.nixosModules.scripts
       self.nixosModules.services-bundle
+      self.nixosModules.shells-bundle
       self.nixosModules.terminals-bundle
       self.nixosModules.tools-bundle
       self.nixosModules.filemanagers-bundle

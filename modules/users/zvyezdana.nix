@@ -14,10 +14,12 @@
           isNormalUser = true;
           extraGroups = [ "wheel" "networkmanager" "audio" "video" ];
           home = "/home/${name}";
-          shell = pkgs.bash;
+          #shell = pkgs.mksh;
         };
 
         programs.bash.enable = true;
+        #environment.systemPackages = [ pkgs.mksh ];
+        #environment.shells = [ "${pkgs.mksh}/bin/mksh" ];
 
         home-manager = {
           

@@ -27,6 +27,11 @@
             # sitelen pona
             "security.fileuri.strict_origin_policy" = false;
             "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+
+            #"places.history.enabled" = false;
+            #"privacy.clearOnShutdown_v2.browsingHistoryAndDownloads" = true;
+            #"privacy.clearOnShutdown_v2.siteSettings" = true;
+            #"privacy.clearOnShutdown_v2.cookiesAndStorage" = true;
           };
 
           policies = {
