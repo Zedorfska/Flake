@@ -9,6 +9,7 @@
       self.nixosModules.yt-dlp
       self.nixosModules.networkmanager
       self.nixosModules.gitui
+      self.nixosModules.sshfs
     ];
   };
 }

@@ -9,6 +9,7 @@
       self.nixosModules.godot
       self.nixosModules.ciscopackettracer
       self.nixosModules.sunshine
+      self.nixosModules.kdeconnect
     ];
   };
 }

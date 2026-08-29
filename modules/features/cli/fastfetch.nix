@@ -37,7 +37,7 @@
               },
               /*"host",*/
               "kernel",
-              "uptime",
+              /*"uptime",*/
               /*"packages",*/
               {
                 "type": "shell",
@@ -67,6 +67,7 @@
               },
               {
                 "type": "disk",
+                "key": "{mountpoint}",
                 "format": "{size-used} / {size-total} ({size-percentage})"
               },
               {
