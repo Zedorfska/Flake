@@ -80,6 +80,7 @@
 
       programming = {
         rust.enable = true;
+        unity.enable = true;
       };
 
       scripts.enable = true;

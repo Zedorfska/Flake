@@ -16,6 +16,8 @@
       "vscode-extension-ms-dotnettools-csharp"
       "vital"
       "obsidian"
+      "unityhub"
+      "corefonts"
 
       "vintagestory"
     ];

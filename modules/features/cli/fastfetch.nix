@@ -21,12 +21,16 @@
             },
             "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
             "logo": {
-                "type": "auto",
-                "padding": {
-                    "top": 0,
-                    "left": 1,
-                    "right": 4
-                }
+              "source": "${./fastfetch}",
+              "type": "auto",
+              "padding": {
+                "top": 0,
+                "left": 1,
+                "right": 3
+              }
+            },
+            "display": {
+              "disableLinewrap": true
             },
             "modules": [
               "title",

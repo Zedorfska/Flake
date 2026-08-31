@@ -2,6 +2,7 @@
   flake.nixosModules.programming-bundle = { ... }: {
     imports = [
       self.nixosModules.rust
+      self.nixosModules.unity
     ];
   };
 }
