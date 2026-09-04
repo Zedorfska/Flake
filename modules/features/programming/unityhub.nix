@@ -7,7 +7,7 @@
     options.device.features.programming.unity.enable = lib.mkEnableOption "Unity Hub";
 
     config = lib.mkIf cfg.enable {
-      environment.systemPackages = [ pkgs.unityhub ];
+      environment.systemPackages = [ pkgs.unityhub pkgs.plasticscm-client-gui ];
     };
   };
 }

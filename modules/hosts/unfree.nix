@@ -18,6 +18,10 @@
       "obsidian"
       "unityhub"
       "corefonts"
+      "plasticscm-client-gui"
+      "plasticscm-client-core-unwrapped"
+      "plasticscm-client-gui-unwrapped"
+      "plasticscm-theme"
 
       "vintagestory"
     ];

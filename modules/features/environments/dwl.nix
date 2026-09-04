@@ -26,9 +26,6 @@
       else "XKB_KEY_${lib.toUpper key}";
 
     dirKeyToXkb = { up = "Up"; down = "Down"; left = "Left"; right = "Right"; };
-    # confirmed from config.h itself: stock focusmon/tagmon already use these
-    # exact symbolic names, so focusdir uses them too instead of raw ints —
-    # one Arg value now works for both.
     dirToC = { left = "WLR_DIRECTION_LEFT"; right = "WLR_DIRECTION_RIGHT"; up = "WLR_DIRECTION_UP"; down = "WLR_DIRECTION_DOWN"; };
 
     wsNums = lib.sort (a: b: a < b) (map lib.toInt
@@ -46,11 +43,6 @@
     tagKeysC = lib.concatMapStrings mkTagBind wsNums;
 
     scNames = builtins.filter (n: lib.hasPrefix "sc" n) (builtins.attrNames kb.workspaces);
-    # fixed Arg shape: element [0] = scratchkey ("s", matched against the
-    # rule's scratchkey char below), elements [1..] = real argv for
-    # execvp (spawnscratch starts reading from index 1), NULL-terminated.
-    # No SHCMD — that produced {"/bin/sh","-c",...}, whose first char is
-    # '/', never 's', which is why togglescratch never matched anything.
     mkScratchBind = name: let key = kb.workspaces.${name}; in
       "\t{ ${mkMod [ kb.mod ]}, ${unshiftedXkb key}, togglescratch, {.v = (const char*[]){ \"s\", \"${d.terminal}\", \"--title\", \"${name}\", NULL } } },\n";
     scratchC = lib.concatMapStrings mkScratchBind scNames;
@@ -89,9 +81,10 @@
     '';
 
     killKeyC = "\t{ ${mkMod [ kb.mod ]}, XKB_KEY_q, killclient, {0} },\n";
+    floatKeyC = "\t{ ${mkMod [ kb.mod ]}, XKB_KEY_v, togglefloating, {0} },\n";
 
     generatedKeys = pkgs.writeText "dwl-generated-keys.h" ''
-      ${tagKeysC}${scratchC}${appsC}${opacityKeysC}${focusDirC}${killKeyC}
+      ${tagKeysC}${scratchC}${appsC}${opacityKeysC}${focusDirC}${killKeyC}${floatKeyC}
     '';
 
     singletagsetApplyRulesFix = pkgs.writeText "singletagset-applyrules-fix.h" ''
@@ -104,48 +97,186 @@
       	}
     '';
 
-    # confirmed against real config.h: stock focusmon takes {.i =
-    # WLR_DIRECTION_*}. On no local match, fall through to focusmon(arg)
-    # directly instead of reimplementing dirtomon-selection ourselves —
-    # reuses its already-correct cursor/focus handling.
     focusdirBodyC = pkgs.writeText "focusdir-body.h" ''
       void focusdir(const Arg *arg)
       {
-      	/* Focus the left, right, up, down client relative to the current
-      	 * focused client on selmon. Falls through to focusmon (stock dwl
-      	 * function) to cross to the adjacent monitor if nothing local matches. */
         Client *c, *sel = focustop(selmon);
-      	if (!sel || sel->isfullscreen)
+      	if (sel && sel->isfullscreen)
       		return;
 
-        int dist=INT_MAX;
-        Client *newsel = NULL;
-        int newdist=INT_MAX;
-        wl_list_for_each(c, &clients, link) {
-          if (!VISIBLEON(c, selmon))
-            continue;
+        if (sel) {
+          int dist=INT_MAX;
+          Client *newsel = NULL;
+          int newdist=INT_MAX;
+          wl_list_for_each(c, &clients, link) {
+            if (!VISIBLEON(c, selmon))
+              continue;
 
-          if (arg->i == WLR_DIRECTION_LEFT && sel->geom.x <= c->geom.x)
-            continue;
-          if (arg->i == WLR_DIRECTION_RIGHT && sel->geom.x >= c->geom.x)
-            continue;
-          if (arg->i == WLR_DIRECTION_UP && sel->geom.y <= c->geom.y)
-            continue;
-          if (arg->i == WLR_DIRECTION_DOWN && sel->geom.y >= c->geom.y)
-            continue;
+            if (arg->i == WLR_DIRECTION_LEFT && sel->geom.x <= c->geom.x)
+              continue;
+            if (arg->i == WLR_DIRECTION_RIGHT && sel->geom.x >= c->geom.x)
+              continue;
+            if (arg->i == WLR_DIRECTION_UP && sel->geom.y <= c->geom.y)
+              continue;
+            if (arg->i == WLR_DIRECTION_DOWN && sel->geom.y >= c->geom.y)
+              continue;
 
-          dist=abs(sel->geom.x-c->geom.x)+abs(sel->geom.y-c->geom.y);
-          if (dist < newdist){
-            newdist = dist;
-            newsel=c;
+            dist=abs(sel->geom.x-c->geom.x)+abs(sel->geom.y-c->geom.y);
+            if (dist < newdist){
+              newdist = dist;
+              newsel=c;
+            }
           }
-        }
-        if (newsel != NULL){
-          focusclient(newsel, 1);
-          return;
+          if (newsel != NULL){
+            focusclient(newsel, 1);
+            wlr_cursor_warp(cursor, NULL, newsel->geom.x + newsel->geom.width / 2.0, newsel->geom.y + newsel->geom.height / 2.0);
+            return;
+          }
         }
 
         focusmon(arg);
+        Client *nc = focustop(selmon);
+        if (nc)
+          wlr_cursor_warp(cursor, NULL, nc->geom.x + nc->geom.width / 2.0, nc->geom.y + nc->geom.height / 2.0);
+      }
+    '';
+
+    # scratchpad clients are floating again (isfloating=1 in the rule below)
+    # so they overlay on top without disturbing normal tiling, Hyprland-
+    # special-workspace style. To stop them stacking on identical default
+    # coordinates, this now explicitly lays out however many scratch
+    # clients exist side-by-side in a centered pane (70% of the monitor's
+    # work area) whenever the group transitions to visible.
+    togglescratchBodyC = pkgs.writeText "togglescratch-body.h" ''
+      void
+      togglescratch(const Arg *arg)
+      {
+      	Client *c;
+      	unsigned int found = 0;
+      	unsigned int visible = 0;
+      	unsigned int n = 0;
+
+      	wl_list_for_each(c, &clients, link)
+      		if (c->scratchkey == ((char**)arg->v)[0][0]) {
+      			found = 1;
+      			n++;
+      			if (VISIBLEON(c, selmon))
+      				visible = 1;
+      		}
+
+      	if (found) {
+      		if (visible) {
+      			wl_list_for_each(c, &clients, link)
+      				if (c->scratchkey == ((char**)arg->v)[0][0])
+      					c->tags = 0;
+      		} else {
+      			int totalw = selmon->w.width * 7 / 10;
+      			int totalh = selmon->w.height * 7 / 10;
+      			int ox = selmon->w.x + (selmon->w.width - totalw) / 2;
+      			int oy = selmon->w.y + (selmon->w.height - totalh) / 2;
+      			int cw = n > 0 ? totalw / n : totalw;
+      			int idx = 0;
+      			wl_list_for_each(c, &clients, link)
+      				if (c->scratchkey == ((char**)arg->v)[0][0]) {
+      					c->tags = selmon->tagset[selmon->seltags];
+      					resize(c, (struct wlr_box){ox + idx*cw, oy, cw, totalh}, 0, 1);
+      					idx++;
+      				}
+      		}
+      		attachclients(selmon);
+      		focusclient(focustop(selmon), 1);
+      		arrange(selmon);
+      	} else {
+      		spawnscratch(arg);
+      	}
+      }
+    '';
+
+    # added hasClients gating: tagHomeMon[] history is now only trusted
+    # when the tag actually still has clients somewhere. A genuinely empty
+    # tag falls straight through to the plain "switch on whichever monitor
+    # I'm on" path, restoring the old default for that case. Static
+    # per-tag monitor pinning (ws1/ws2/ws3) is the natural next slot here
+    # but needs real output names first — see chat.
+    viewBodyC = pkgs.writeText "view-body.h" ''
+      static Monitor *tagHomeMon[32];
+
+      void
+      view(const Arg *arg)
+      {
+      	Monitor *m, *origm = selmon;
+      	unsigned int newtags;
+      	int i;
+      	Client *tc, *cc;
+      	int hasClients = 0;
+
+      	if (!selmon || (arg->ui & TAGMASK) == selmon->tagset[selmon->seltags])
+      		return;
+
+      	newtags = arg->ui & TAGMASK;
+
+      	wl_list_for_each(m, &mons, link) {
+      		if (m != origm && newtags && (newtags & m->tagset[m->seltags])) {
+      			selmon = m;
+      			focusclient(focustop(m), 1);
+      			tc = focustop(m);
+      			if (tc)
+      				wlr_cursor_warp(cursor, NULL, tc->geom.x + tc->geom.width / 2.0, tc->geom.y + tc->geom.height / 2.0);
+      			else
+      				wlr_cursor_warp(cursor, NULL, m->m.x + m->m.width / 2.0, m->m.y + m->m.height / 2.0);
+      			arrange(m);
+      			printstatus();
+      			for (i = 0; i < 32; i++)
+      				if (newtags & (1u << i))
+      					tagHomeMon[i] = m;
+      			return;
+      		}
+      	}
+
+      	wl_list_for_each(cc, &clients, link)
+      		if (cc->tags & newtags) { hasClients = 1; break; }
+
+      	if (hasClients) {
+      		for (i = 0; i < 32; i++) {
+      			if (!(newtags & (1u << i)) || !tagHomeMon[i] || tagHomeMon[i] == origm)
+      				continue;
+      			{
+      				Monitor *home = tagHomeMon[i];
+      				int alive = 0;
+      				wl_list_for_each(m, &mons, link)
+      					if (m == home)
+      						alive = 1;
+      				if (!alive)
+      					continue;
+      				home->seltags ^= 1;
+      				home->tagset[home->seltags] = newtags;
+      				attachclients(home);
+      				selmon = home;
+      				focusclient(focustop(home), 1);
+      				tc = focustop(home);
+      				if (tc)
+      					wlr_cursor_warp(cursor, NULL, tc->geom.x + tc->geom.width / 2.0, tc->geom.y + tc->geom.height / 2.0);
+      				else
+      					wlr_cursor_warp(cursor, NULL, home->m.x + home->m.width / 2.0, home->m.y + home->m.height / 2.0);
+      				arrange(home);
+      				printstatus();
+      				return;
+      			}
+      		}
+      	}
+
+      	origm->seltags ^= 1;
+      	if (arg->ui & TAGMASK)
+      		origm->tagset[origm->seltags] = arg->ui & TAGMASK;
+
+      	attachclients(origm);
+      	focusclient(focustop(origm), 1);
+      	arrange(origm);
+      	printstatus();
+
+      	for (i = 0; i < 32; i++)
+      		if (newtags & (1u << i))
+      			tagHomeMon[i] = origm;
       }
     '';
 
@@ -175,9 +306,19 @@
 
         cp config.def.h config.h
         sed -i 's/#define MODKEY WLR_MODIFIER_[A-Z]*/#define MODKEY ${modToC.${kb.mod}}/' config.h
+
+        # keyboard layout: Croatian QWERTZ default, SUPER+space toggles to
+        # Serbian (Cyrillic by default in XKB). Standard libxkbcommon
+        # struct, not a patch — but unverified against this exact config.h's
+        # formatting. If it silently doesn't take, grep -n -A8
+        # 'xkb_rule_names xkb_rules' config.h for the real text to match.
+        sed -i 's/static const struct xkb_rule_names xkb_rules = {/static const struct xkb_rule_names xkb_rules = {\n\t.layout = "hr,rs",\n\t.options = "grp:win_space_toggle",/' config.h
+
         sed -i "s|static const char \*tags\[\] = {.*};|${tagsArrayC}|" config.h
         sed -i '/static const Key keys\[\] = {/r ${generatedKeys}' config.h
         sed -i '/static const char \*const autostart\[\] = {/r ${autostartC}' config.h
+
+        sed -i '/{ MODKEY,                    XKB_KEY_space,       setlayout,        {0} },/d' config.h
 
         sed -i 's/unsigned int i, n = 0;/unsigned int i, n = 0, draw_borders = 1;/' dwl.c
         sed -i '/nx = m->w.x;/i\	if (n == smartborders) draw_borders = 0;' dwl.c
@@ -189,16 +330,26 @@
         sed -i 's/c->scratchkey = r->scratchkey;/c->scratchkey = r->scratchkey;\n\t\t\tc->opacity_focus = r->opacity_focus;\n\t\t\tc->opacity_unfocus = r->opacity_unfocus;/' dwl.c
         sed -i 's|{ "Gimp_EXAMPLE",     NULL,         0,            1,           -1,     0   },|{ "Gimp_EXAMPLE",     NULL,         0,            1,           1.00,  0.20,  -1,     0   },|' config.h
         sed -i 's|{ "firefox_EXAMPLE",  NULL,         1 << 8,       0,           -1,     0   },|{ "firefox_EXAMPLE",  NULL,         1 << 8,       0,           1.00,  1.00,  -1,     0   },|' config.h
-        # title matched to what we actually spawn (was "scratchpad" on
-        # both sides in the version that just built — check this line is
-        # actually present after you save)
-        sed -i "s|{ NULL,               \"scratchpad\", 0,            1,           -1,     's' },|{ NULL,               \"${scratchName}\", 0,            1,           1.00,  1.00,  -1,     's' },|" config.h
+        # isfloating reverted 0 -> 1: overlay-on-top behavior needs
+        # floating clients; the stacking problem that motivated dropping
+        # it to 0 is now solved via explicit positioning in togglescratch
+        # instead.
+        sed -i "s|{ NULL,               \"scratchpad\", 0,            1,           -1,     's' },|{ NULL,               \"${scratchName}\", (1u << 31),   1,           1.00,  1.00,  -1,     's' },|" config.h
 
         sed -i '/c->isfloating |= client_is_float_type(c);/r ${singletagsetApplyRulesFix}' dwl.c
         sed -i 's/setmon(c, mon, newtags);/setmon(c, mon, newtags);\n\tattachclients(mon);/' dwl.c
         sed -i '/static void applyrules(Client \*c);/a\static void attachclients(Monitor *m);' dwl.c
         sed -i '/static void attachclients(Monitor \*m);/a\static void focusdir(const Arg *arg);' dwl.c
         cat ${focusdirBodyC} >> dwl.c
+
+        sed -i 's/^togglescratch(const Arg \*arg)$/togglescratch_unused_old(const Arg *arg)/' dwl.c
+        cat ${togglescratchBodyC} >> dwl.c
+
+        sed -i 's/^view(const Arg \*arg)$/view_unused_old(const Arg *arg)/' dwl.c
+        cat ${viewBodyC} >> dwl.c
+
+        sed -i '59{/tile/s/tile/dwindle/}' config.h
+        sed -i '62{/dwindle/s/dwindle/tile/}' config.h
       '';
     });
   in {
