@@ -10,6 +10,8 @@
       self.nixosModules.networkmanager
       self.nixosModules.gitui
       self.nixosModules.sshfs
+      self.nixosModules.monero
+      self.nixosModules.mullvad
     ];
   };
 }

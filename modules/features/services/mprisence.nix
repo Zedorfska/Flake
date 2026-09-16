@@ -101,6 +101,9 @@
 
           [web_player.youtube]
           ignore = true
+
+          [player.mpv]
+          ignore = true
         '';
       };
     };

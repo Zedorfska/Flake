@@ -103,6 +103,8 @@
         yt-dlp.enable = true;
         networkmanager.enable = true;
         gitui.enable = true;
+        monero.enable = true;
+        mullvad.enable = true;
       };
 
       tools = {

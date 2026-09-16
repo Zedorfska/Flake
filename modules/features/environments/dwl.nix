@@ -49,10 +49,11 @@
 
     scratchName = builtins.head scNames;
     scratchAutostart = [
-      [ d.terminal "--title" scratchName "rmpc" ]
-      [ d.terminal "--title" scratchName "tty-clock" ]
-      [ d.terminal "--hold" "--title" scratchName "fastfetch" ]
+      [ d.terminal "--title" "${scratchName}-rmpc" "rmpc" ]
+      [ d.terminal "--title" "${scratchName}-clock" "tty-clock" ]
+      [ d.terminal "--hold" "--title" "${scratchName}-fastfetch" "fastfetch" ]
     ];
+
     autostartC = pkgs.writeText "dwl-autostart.h" (lib.concatMapStrings
       (argv: lib.concatMapStrings (a: "\t\"${a}\",\n") argv + "\tNULL,\n")
       scratchAutostart);
@@ -97,6 +98,9 @@
       	}
     '';
 
+    # floating/tiled separation kept for general correctness (any real
+    # floating dialog later) — no longer the fix for the scratchpad issue
+    # specifically, since scratch clients are tiled again as of this round.
     focusdirBodyC = pkgs.writeText "focusdir-body.h" ''
       void focusdir(const Arg *arg)
       {
@@ -110,6 +114,8 @@
           int newdist=INT_MAX;
           wl_list_for_each(c, &clients, link) {
             if (!VISIBLEON(c, selmon))
+              continue;
+            if (c->isfloating != sel->isfloating)
               continue;
 
             if (arg->i == WLR_DIRECTION_LEFT && sel->geom.x <= c->geom.x)
@@ -141,63 +147,47 @@
       }
     '';
 
-    # scratchpad clients are floating again (isfloating=1 in the rule below)
-    # so they overlay on top without disturbing normal tiling, Hyprland-
-    # special-workspace style. To stop them stacking on identical default
-    # coordinates, this now explicitly lays out however many scratch
-    # clients exist side-by-side in a centered pane (70% of the monitor's
-    # work area) whenever the group transitions to visible.
+    # complete rewrite: scratch group is now an ordinary tag (bit 31,
+    # already assigned via the rules[] row below) toggled into/out of
+    # selmon's currently-visible tagset, same idea as toggleview but for a
+    # dedicated always-hidden-by-default bit. No positioning code, no
+    # floating, no focus memory needed — dwindle tiles the group together
+    # with whatever else is on screen, and any new client spawned while
+    # the bit is active inherits it automatically (confirmed via setmon's
+    # own `c->tags = newtags ? newtags : m->tagset[m->seltags]` logic),
+    # joining the tiled arrangement with zero extra code. Falls back to
+    # spawnscratch() only when the group is completely empty (nothing
+    # anywhere carries the tag yet).
     togglescratchBodyC = pkgs.writeText "togglescratch-body.h" ''
       void
       togglescratch(const Arg *arg)
       {
-      	Client *c;
+      	Client *c, *tc;
+      	unsigned int scratchTag = 1u << 31;
       	unsigned int found = 0;
-      	unsigned int visible = 0;
-      	unsigned int n = 0;
 
       	wl_list_for_each(c, &clients, link)
-      		if (c->scratchkey == ((char**)arg->v)[0][0]) {
+      		if (c->tags & scratchTag) {
       			found = 1;
-      			n++;
-      			if (VISIBLEON(c, selmon))
-      				visible = 1;
+      			break;
       		}
 
-      	if (found) {
-      		if (visible) {
-      			wl_list_for_each(c, &clients, link)
-      				if (c->scratchkey == ((char**)arg->v)[0][0])
-      					c->tags = 0;
-      		} else {
-      			int totalw = selmon->w.width * 7 / 10;
-      			int totalh = selmon->w.height * 7 / 10;
-      			int ox = selmon->w.x + (selmon->w.width - totalw) / 2;
-      			int oy = selmon->w.y + (selmon->w.height - totalh) / 2;
-      			int cw = n > 0 ? totalw / n : totalw;
-      			int idx = 0;
-      			wl_list_for_each(c, &clients, link)
-      				if (c->scratchkey == ((char**)arg->v)[0][0]) {
-      					c->tags = selmon->tagset[selmon->seltags];
-      					resize(c, (struct wlr_box){ox + idx*cw, oy, cw, totalh}, 0, 1);
-      					idx++;
-      				}
-      		}
-      		attachclients(selmon);
-      		focusclient(focustop(selmon), 1);
-      		arrange(selmon);
-      	} else {
+      	if (!found) {
       		spawnscratch(arg);
+      		return;
       	}
+
+      	selmon->tagset[selmon->seltags] ^= scratchTag;
+      	attachclients(selmon);
+      	arrange(selmon);
+      	tc = focustop(selmon);
+      	focusclient(tc, 1);
+      	if (tc)
+      		wlr_cursor_warp(cursor, NULL, tc->geom.x + tc->geom.width / 2.0, tc->geom.y + tc->geom.height / 2.0);
+      	printstatus();
       }
     '';
 
-    # added hasClients gating: tagHomeMon[] history is now only trusted
-    # when the tag actually still has clients somewhere. A genuinely empty
-    # tag falls straight through to the plain "switch on whichever monitor
-    # I'm on" path, restoring the old default for that case. Static
-    # per-tag monitor pinning (ws1/ws2/ws3) is the natural next slot here
-    # but needs real output names first — see chat.
     viewBodyC = pkgs.writeText "view-body.h" ''
       static Monitor *tagHomeMon[32];
 
@@ -307,11 +297,6 @@
         cp config.def.h config.h
         sed -i 's/#define MODKEY WLR_MODIFIER_[A-Z]*/#define MODKEY ${modToC.${kb.mod}}/' config.h
 
-        # keyboard layout: Croatian QWERTZ default, SUPER+space toggles to
-        # Serbian (Cyrillic by default in XKB). Standard libxkbcommon
-        # struct, not a patch — but unverified against this exact config.h's
-        # formatting. If it silently doesn't take, grep -n -A8
-        # 'xkb_rule_names xkb_rules' config.h for the real text to match.
         sed -i 's/static const struct xkb_rule_names xkb_rules = {/static const struct xkb_rule_names xkb_rules = {\n\t.layout = "hr,rs",\n\t.options = "grp:win_space_toggle",/' config.h
 
         sed -i "s|static const char \*tags\[\] = {.*};|${tagsArrayC}|" config.h
@@ -330,11 +315,9 @@
         sed -i 's/c->scratchkey = r->scratchkey;/c->scratchkey = r->scratchkey;\n\t\t\tc->opacity_focus = r->opacity_focus;\n\t\t\tc->opacity_unfocus = r->opacity_unfocus;/' dwl.c
         sed -i 's|{ "Gimp_EXAMPLE",     NULL,         0,            1,           -1,     0   },|{ "Gimp_EXAMPLE",     NULL,         0,            1,           1.00,  0.20,  -1,     0   },|' config.h
         sed -i 's|{ "firefox_EXAMPLE",  NULL,         1 << 8,       0,           -1,     0   },|{ "firefox_EXAMPLE",  NULL,         1 << 8,       0,           1.00,  1.00,  -1,     0   },|' config.h
-        # isfloating reverted 0 -> 1: overlay-on-top behavior needs
-        # floating clients; the stacking problem that motivated dropping
-        # it to 0 is now solved via explicit positioning in togglescratch
-        # instead.
-        sed -i "s|{ NULL,               \"scratchpad\", 0,            1,           -1,     's' },|{ NULL,               \"${scratchName}\", (1u << 31),   1,           1.00,  1.00,  -1,     's' },|" config.h
+        # isfloating reverted 1 -> 0: group is tiled now, not a floating
+        # overlay — the whole point of this round's redesign.
+        sed -i "s|{ NULL,               \"scratchpad\", 0,            1,           -1,     's' },|{ NULL,               \"${scratchName}\", (1u << 31),   0,           1.00,  1.00,  -1,     's' },|" config.h
 
         sed -i '/c->isfloating |= client_is_float_type(c);/r ${singletagsetApplyRulesFix}' dwl.c
         sed -i 's/setmon(c, mon, newtags);/setmon(c, mon, newtags);\n\tattachclients(mon);/' dwl.c

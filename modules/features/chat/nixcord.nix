@@ -59,7 +59,7 @@
           };
 
           legcord = {
-            enable = false;
+            enable = true;
             # Optionally bundle Vencord or Equicord (also installs userPlugins)
             vencord.enable = false;
             equicord.enable = false;
@@ -256,7 +256,6 @@
               ### UI changes
               ### 
               platformIndicators.enable = true;
-              sortFriendRequests.enable = false;
               sortFriends.enable = true;
               showMeYourName =
               {
