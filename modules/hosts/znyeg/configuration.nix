@@ -88,6 +88,7 @@
       browsers = {
         librewolf.enable = true;
         firefox.enable = true;
+        tor.enable = true;
       };
 
       cli = {
@@ -102,8 +103,7 @@
         nvf.enable = true;
         yt-dlp.enable = true;
         networkmanager.enable = true;
-        gitui.enable = true;
-        monero.enable = true;
+        gitui.enable = false;
         mullvad.enable = true;
       };
 
