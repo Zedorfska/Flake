@@ -55,6 +55,16 @@
     config = lib.mkIf cfg.enable {
       programs.gpu-screen-recorder.enable = true;
 
+      # OpenAL-Soft's PipeWire stream has no appname fix yay
+      services.pipewire.extraConfig.client."10-java-app-name" = {
+        "stream.rules" = [
+          {
+            matches = [ { "node.name" = "java"; } ];
+            actions.update-props."application.name" = "Minecraft";
+          }
+        ];
+      };
+
       home-manager.users.${user} = {
         home.packages = [ pkgs.gpu-screen-recorder create-clip ];
 

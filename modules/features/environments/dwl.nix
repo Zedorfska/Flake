@@ -281,10 +281,9 @@
     focusdirPatch = mkPatch "focusdir" "focusdir.patch" "sha256-IY8NKUAJoK6lBPCl6CgQ1gFcMkqic9H4RmVs422yp7A=";
 
     dwlPatches = [
-      (mkPatch "namedscratchpads" "namedscratchpads-0.8.patch" "sha256-o2+iSnlloZY1/GzEH1EIFurmM/j4I9qQ1LrVGIQA7nQ=")
       (mkPatch "dwindle" "dwindle.patch" "sha256-fwzvqhHXEPx44dOeTzluFRsIXiXRGZR9FA0db/dZVfM=")
       (mkPatch "smartborders" "smartborders.patch" "sha256-5vsBsvdwQ4Vj1aEQgKkhOIv1Huk+taAtXFw6s25Ld6M=")
-      (mkPatch "autostart" "autostart-0.8.patch" "sha256-q5wdOMZKVD1FH+ApUiC8/lmOEKIC9PrgrWYxHmNrZ6A=")
+      (mkPatch "autostart" "autostart_0.8.patch" "sha256-q5wdOMZKVD1FH+ApUiC8/lmOEKIC9PrgrWYxHmNrZ6A=")
     ];
 
     dwlPackage = pkgs.dwl.overrideAttrs (old: {
@@ -311,6 +310,7 @@
         sed -i 's/resize(c, (struct wlr_box){nx, ny, w, nh}, 0);/resize(c, (struct wlr_box){nx, ny, w, nh}, 0, draw_borders);/' dwl.c
         sed -i 's/resize(c, (struct wlr_box){nx, ny, nw, h}, 0);/resize(c, (struct wlr_box){nx, ny, nw, h}, 0, draw_borders);/' dwl.c
 
+        sed -i 's/int isfloating, isurgent, isfullscreen;/int isfloating, isurgent, isfullscreen;\n\tchar scratchkey;/' dwl.c
         sed -i 's/\tchar scratchkey;/\tchar scratchkey;\n\tfloat opacity;\n\tfloat opacity_focus;\n\tfloat opacity_unfocus;/' dwl.c
         sed -i 's/c->scratchkey = r->scratchkey;/c->scratchkey = r->scratchkey;\n\t\t\tc->opacity_focus = r->opacity_focus;\n\t\t\tc->opacity_unfocus = r->opacity_unfocus;/' dwl.c
         sed -i 's|{ "Gimp_EXAMPLE",     NULL,         0,            1,           -1,     0   },|{ "Gimp_EXAMPLE",     NULL,         0,            1,           1.00,  0.20,  -1,     0   },|' config.h

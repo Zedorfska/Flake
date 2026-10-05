@@ -25,6 +25,8 @@
     phonto.url = "github:museslabs/phonto";
 
     millenium.url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
+
+    copyparty.url = "github:9001/copyparty";
   };
   
   outputs = inputs:

@@ -11,6 +11,8 @@
       self.nixosModules.mprisence
       self.nixosModules.phonto
       self.nixosModules.hyprpolkitagent
+      self.nixosModules.copyparty
+      self.nixosModules.mediawiki
     ];
   };
 }

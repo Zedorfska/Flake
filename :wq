@@ -1,0 +1,49 @@
+{ self, inputs, ... }: {
+  flake.nixosModules.copyparty = { config, lib, ... }:
+    let cfg = config.device.features.services.copyparty; in {
+      imports = [ inputs.copyparty.nixosModules.default ];
+
+      options.device.features.services.copyparty.enable =
+        lib.mkEnableOption "copyparty file server behind Caddy (public HTTPS)";
+
+      config = lib.mkIf cfg.enable {
+        nixpkgs.overlays = [ inputs.copyparty.overlays.default ];
+
+        services.copyparty = {
+          enable = true;
+          settings = {
+            i = "127.0.0.1";
+            p = [ 3923 ];
+            xff-src = "127.0.0.1";
+            rproxy = -1;
+            ban-pw = "5,60,1440";
+          };
+          accounts.zed.passwordFile = "/var/lib/copyparty/zed.pw";
+          accounts.betonac.passwordFile = "/var/lib/copyparty/betonac.pw";
+          accounts.luce.passwordFile = "/var/lib/copyparty/luce.pw";
+          volumes."/" = {
+            path = "/srv/copyparty";
+            access.rw = [ "zed" "luce" ];
+            access.r = [ "betonac" ];
+          };
+        };
+
+        services.caddy = {
+          enable = true;
+          virtualHosts."files.beton.gay".extraConfig = ''
+            reverse_proxy 127.0.0.1:3923
+          '';
+          virtualHosts."map.beton.gay".extraConfig = ''
+            reverse_proxy 127.0.0.1:8100
+          ''; 
+        };
+
+        systemd.services.copyparty.wantedBy = lib.mkForce [ ];
+        systemd.services.caddy.wantedBy = lib.mkForce [ ];
+
+        networking.firewall.allowedTCPPorts = [ 80 443 ];
+
+        systemd.tmpfiles.rules = [ "d /srv/copyparty 0750 copyparty copyparty -" ];
+      };
+    };
+}

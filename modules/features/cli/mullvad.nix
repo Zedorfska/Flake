@@ -6,7 +6,7 @@
     options.device.features.cli.mullvad.enable = lib.mkEnableOption "Mullvad";
 
     config = lib.mkIf cfg.enable {
-      environment.systemPackages = [ pkgs.mullvad ];
+      services.mullvad-vpn.enable = true;
     };
   };
 }

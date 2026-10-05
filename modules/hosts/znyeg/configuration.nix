@@ -1,6 +1,7 @@
 { self, inputs, ... }: {
   
   flake.nixosModules.ZnyegConfiguration = { pkgs, lib, config, ... }: {
+
     boot.kernelPackages = pkgs.linuxPackages_latest;
 
     networking.hostName = "Znyeg";
@@ -9,7 +10,7 @@
     networking.firewall.allowedTCPPorts = [
       443 80 # Webserver
       8100 # Bluemap
-      25565 # Minecraft
+      25565 25566 # Minecraft
       47984 47989 48010 # Sunshine
     ];
     networking.firewall.allowedTCPPortRanges = [
@@ -39,6 +40,7 @@
       drivers.amd.enable = true;
 
       services = {
+        copyparty.enable = true;
         gpu-screen-recorder.enable = true;
         swww.enable = false;
         kanshi.enable = true;
@@ -51,11 +53,12 @@
         mprisence.enable = true;
         phonto.enable = true;
         hyprpolkitagent.enable = false;
+        mediawiki.enable = true;
       };
 
       environments = {
         hyprland.enable = true;
-        dwl.enable = true;
+        dwl.enable = false;
         #hevel.enable = false;
       };
 

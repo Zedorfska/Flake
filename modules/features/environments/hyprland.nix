@@ -120,6 +120,12 @@
           disable_hyprland_logo   = true,
         },
       })
+
+      -- Dont maximise Kitty
+      hl.window_rule({
+        match = { class = "^(kitty)$" },
+        suppress_event = "maximize",
+      })
     '';
   in {
     options.device.features.environments.hyprland.enable =
