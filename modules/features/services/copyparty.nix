@@ -26,6 +26,11 @@
             access.rw = [ "zed" "luce" ];
             access.r = [ "betonac" ];
           };
+          volumes."/getting-easier" = {
+            path = "/srv/copyparty/getting-easier";
+            access.r = [ "*" ];
+            access.rw = [ "zed" "luce" ];
+          };
         };
 
         services.caddy = {
@@ -35,9 +40,6 @@
           '';
           virtualHosts."map.beton.gay".extraConfig = ''
             reverse_proxy 127.0.0.1:8100
-          '';
-          virtualHosts."wiki.beton.gay".extraConfig = ''
-            reverse_proxy 127.0.0.1:8080
           '';
         };
 

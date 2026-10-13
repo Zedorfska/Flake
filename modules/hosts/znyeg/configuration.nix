@@ -10,6 +10,7 @@
     networking.firewall.allowedTCPPorts = [
       443 80 # Webserver
       8100 # Bluemap
+      8080 #
       25565 25566 # Minecraft
       47984 47989 48010 # Sunshine
     ];
@@ -53,7 +54,7 @@
         mprisence.enable = true;
         phonto.enable = true;
         hyprpolkitagent.enable = false;
-        mediawiki.enable = true;
+        mediawiki.enable = false;
       };
 
       environments = {

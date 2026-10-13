@@ -9,6 +9,7 @@
     config = lib.mkIf cfg.enable {
       home-manager.users.${user} = {
         home.packages = with pkgs; [
+          godot
           godot-mono
           dotnet-sdk
         ];
