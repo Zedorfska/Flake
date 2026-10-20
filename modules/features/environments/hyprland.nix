@@ -13,7 +13,7 @@
       ---          ---
       hl.monitor({
         output   = "DP-1",
-        mode     = "1920x1080@143.85Hz",
+        mode     = "1920x1080@300Hz",
         position = "0x0",
         scale    = "auto",
       })
@@ -107,6 +107,9 @@
       --- VISUAL ---
       ---        ---
 
+      hl.curve("snappy", { type = "bezier", points = { {0.2, 1.0}, {0.3, 1.0} } })
+hl.animation({ leaf = "workspaces", enabled = true, speed = 2, bezier = "snappy", style = "slide" })
+
       ---            ---
       --- WORKSPACES ---
       ---            ---
@@ -131,21 +134,20 @@
     options.device.features.environments.hyprland.enable =
       lib.mkEnableOption "Hyprland Tiling Window Manager";
       config = lib.mkIf cfg.enable {
-  programs.hyprland.enable = true;
-  home-manager.users.${user} = {
-    home.file.".config/hypr/hyprland.lua".text = hyprlandLua;
+        programs.hyprland.enable = true;
+        home-manager.users.${user} = {
+        home.file.".config/hypr/hyprland.lua".text = hyprlandLua;
 
-    systemd.user.targets.hyprland-session = {
-      Unit = {
-        Description = "Hyprland compositor session";
-        Documentation = "man:systemd.special(7)";
-        BindsTo = [ "graphical-session.target" ];
-        Wants = [ "graphical-session-pre.target" ];
-        After = [ "graphical-session-pre.target" ];
+        systemd.user.targets.hyprland-session = {
+          Unit = {
+            Description = "Hyprland compositor session";
+            Documentation = "man:systemd.special(7)";
+            BindsTo = [ "graphical-session.target" ];
+            Wants = [ "graphical-session-pre.target" ];
+            After = [ "graphical-session-pre.target" ];
+          };
+        };
       };
     };
-  };
-};
-
   };
 }

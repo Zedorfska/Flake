@@ -27,6 +27,11 @@
     millenium.url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
 
     copyparty.url = "github:9001/copyparty";
+
+    kitsu = {
+      url = "github:zedorfska/kitsu-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
   
   outputs = inputs:

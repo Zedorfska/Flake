@@ -19,7 +19,7 @@
                 outputs = [
                   {
                     criteria = "DP-1";
-                    mode = "1920x1080@143.85";
+                    mode = "1920x1080@300";
                     position = "0,0";
                     status = "enable";
                   }

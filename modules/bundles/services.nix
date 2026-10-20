@@ -13,6 +13,8 @@
       self.nixosModules.hyprpolkitagent
       self.nixosModules.copyparty
       self.nixosModules.mediawiki
+      self.nixosModules.kitsu
+      self.nixosModules.hedgedoc
     ];
   };
 }

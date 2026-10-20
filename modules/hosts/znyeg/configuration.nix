@@ -37,24 +37,23 @@
     device.core.localisation.enable = true;
     device.features = {
 
-      drivers.nvidia.enable = false;
       drivers.amd.enable = true;
 
       services = {
         copyparty.enable = true;
         gpu-screen-recorder.enable = true;
-        swww.enable = false;
         kanshi.enable = true;
         pipewire.enable = true;
         mpd = {
           enable = true;
           musicDirectory = "/mnt/hdd/music";
         };
-        mpvpaper.enable = false;
         mprisence.enable = true;
         phonto.enable = true;
         hyprpolkitagent.enable = false;
         mediawiki.enable = false;
+        hedgedoc.enable = true;
+        kitsu.enable = true;
       };
 
       environments = {
@@ -68,7 +67,6 @@
       };
 
       shells = {
-        mksh.enable = false;
         bash.enable = true;
       };
 
