@@ -53,13 +53,14 @@
         hyprpolkitagent.enable = false;
         mediawiki.enable = false;
         hedgedoc.enable = true;
-        kitsu.enable = true;
+        kitsu.enable = false;
       };
 
       environments = {
         hyprland.enable = true;
         dwl.enable = false;
         #hevel.enable = false;
+        niri.enable = true;
       };
 
       filemanagers = {

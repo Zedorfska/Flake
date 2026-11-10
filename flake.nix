@@ -22,7 +22,10 @@
     nixcord.url = "github:4evy/nixcord";
     nvf.url = "github:notashelf/nvf";
 
-    phonto.url = "github:museslabs/phonto";
+    phonto = {
+      url = "github:museslabs/phonto";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     millenium.url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
 
