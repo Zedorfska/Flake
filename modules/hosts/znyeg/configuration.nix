@@ -40,7 +40,7 @@
       drivers.amd.enable = true;
 
       services = {
-        copyparty.enable = true;
+        copyparty.enable = false;
         gpu-screen-recorder.enable = true;
         kanshi.enable = true;
         pipewire.enable = true;
@@ -52,7 +52,7 @@
         phonto.enable = true;
         hyprpolkitagent.enable = false;
         mediawiki.enable = false;
-        hedgedoc.enable = true;
+        hedgedoc.enable = false;
         kitsu.enable = false;
       };
 
@@ -144,6 +144,7 @@
 
       chat = {
         nixcord.enable = true;
+        tiny.enable = true;
       };
 
       gaming = {
@@ -152,6 +153,7 @@
         wine.enable = true;
         vintagestory.enable = false;
         bottles.enable = false;
+        vr.enable = true;
       };
 
       themes = {

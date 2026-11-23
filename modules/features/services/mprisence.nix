@@ -3,13 +3,16 @@
   let
     cfg  = config.device.features.services.mprisence;
     user = config.internal.username;
+    mprisence = pkgs.mprisence.overrideAttrs (old: {
+      buildInputs = (old.buildInputs or []) ++ [ pkgs.aws-lc ];
+    });
   in {
     options.device.features.services.mprisence.enable =
       lib.mkEnableOption "mprisence Discord Rich Presence for MPRIS";
 
     config = lib.mkIf cfg.enable {
       home-manager.users.${user} = {
-        home.packages = [ pkgs.mprisence pkgs.mpd-mpris pkgs.arrpc ];
+        home.packages = [ mprisence pkgs.mpd-mpris pkgs.arrpc ];
 
         systemd.user.services.arrpc = {
           Unit = {
@@ -50,7 +53,7 @@
             PartOf = [ "graphical-session.target" ];
           };
           Service = {
-            ExecStart = "${pkgs.mprisence}/bin/mprisence";
+            ExecStart = "${mprisence}/bin/mprisence";
             Restart = "on-failure";
             RestartSec = 5;
           };

@@ -6,6 +6,7 @@
       self.nixosModules.wine
       self.nixosModules.vintagestory
       self.nixosModules.bottles
+      self.nixosModules.vr
     ];
   };
 }
